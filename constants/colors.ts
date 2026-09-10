@@ -1,0 +1,72 @@
+export const Colors = {
+  PRIMARY: '#1A5DAB',
+  PRIMARY_DARK: '#0F4C8A',
+  PRIMARY_LIGHT: '#E8F1FB',
+  BLACK: '#0A1B2A',
+  WHITE: '#FFFFFF',
+  GRAY: '#F0F6FF',
+  LIGHT_GRAY: '#D6E4F0',
+  DARK_GRAY: '#5A7A9A',
+  GREEN: '#0B9B4A',
+  YELLOW: '#F5A623',
+  BLUE: '#1A5DAB',
+  BRAND: '#1A5DAB',
+  BRAND_SECONDARY: '#0F4C8A',
+  AMBER: '#F5A623',
+  EMERALD: '#059669',
+  RED_500: '#EF4444',
+  RED_50: '#FEF2F2',
+  RED_600: '#DC2626',
+  EMERALD_500: '#10B981',
+  EMERALD_600: '#059669',
+  MUTED: '#EEF4FB',
+  MUTED_FOREGROUND: '#5A7A9A',
+  CARD: '#FFFFFF',
+  BORDER: '#E0EBF7',
+  RING: '#1A5DAB',
+  BACKDROP: 'rgba(255,255,255,0.92)',
+  CREAM: '#F0F6FF',
+  ESPRESSO: '#0A1B2A',
+  LATTE: '#D6E4F0',
+  FOAM: '#EEF4FB',
+  GOLD: '#F5A623',
+  SURFACE: '#FAFCFF',
+  SURFACE_ELEVATED: '#FFFFFF',
+  OVERLAY: 'rgba(10,27,42,0.04)',
+};
+
+export const Spacing = {
+  XS: 4,
+  SM: 8,
+  MD: 16,
+  LG: 20,
+  XL: 24,
+  XXL: 32,
+};
+
+export const Radius = {
+  CHIP: 30,
+  CARD: 16,
+  SM: 8,
+  MD: 12,
+  LG: 24,
+  PILL: 100,
+};
+
+export const Typography = {
+  fontSize: {
+    xs: 12,
+    sm: 14,
+    base: 16,
+    lg: 18,
+    xl: 20,
+    '2xl': 24,
+    '3xl': 28,
+  },
+  fontWeight: {
+    medium: '500' as const,
+    semibold: '600' as const,
+    bold: '700' as const,
+    extrabold: '800' as const,
+  },
+};
