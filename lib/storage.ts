@@ -38,4 +38,41 @@ const fallbackStorage = {
   },
 };
 
-export const persistentStorage = isWeb ? webStorage : fallbackStorage;
+let nativeStorage: typeof webStorage | null = null;
+try {
+  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+  nativeStorage = {
+    getItem: (name: string): string | null => {
+      AsyncStorage.getItem(name).then((v: string | null) => {
+        if (v !== null) syncCache[name] = v;
+      }).catch(() => {});
+      return syncCache[name] ?? null;
+    },
+    setItem: (name: string, value: string): void => {
+      syncCache[name] = value;
+      AsyncStorage.setItem(name, value).catch(() => {});
+    },
+    removeItem: (name: string): void => {
+      delete syncCache[name];
+      AsyncStorage.removeItem(name).catch(() => {});
+    },
+  };
+} catch {
+  // AsyncStorage not installed — use in-memory fallback
+}
+
+const syncCache: Record<string, string> = {};
+
+if (!isWeb && nativeStorage) {
+  const keys = ['krust-favorites', 'krust-customer', 'krust-orders', 'krust-cart'];
+  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+  keys.forEach((key) => {
+    AsyncStorage.getItem(key).then((val: string | null) => {
+      if (val !== null) syncCache[key] = val;
+    }).catch(() => {});
+  });
+}
+
+export const persistentStorage = isWeb
+  ? webStorage
+  : nativeStorage ?? fallbackStorage;
