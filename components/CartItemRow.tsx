@@ -2,7 +2,7 @@
  * CartItemRow - Individual cart item with animations and haptic feedback
  */
 
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
@@ -18,7 +18,14 @@ import { shadows } from "@/src/design-tokens/shadows";
 import { space } from "@/src/design-tokens/spacing";
 import { borderRadius } from "@/src/design-tokens/border-radius";
 import { CartItem } from '@/store/useCartStore';
-import * as Haptics from 'expo-haptics';
+
+const triggerHaptic = (style: 'light' | 'medium') => {
+  if (Platform.OS === 'web') return;
+  try {
+    const Haptics = require('expo-haptics');
+    Haptics.impactAsync(style === 'light' ? Haptics.ImpactFeedbackStyle.Light : Haptics.ImpactFeedbackStyle.Medium);
+  } catch {}
+};
 
 interface CartItemRowProps {
   item: CartItem;
@@ -35,7 +42,7 @@ export default function CartItemRow({ item, onIncrement, onDecrement, onRemove }
 
   const handlePressIn = () => {
     scale.value = withSpring(0.95, { damping: 10, stiffness: 200 });
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    triggerHaptic('light');
   };
 
   const handlePressOut = () => {
@@ -43,7 +50,7 @@ export default function CartItemRow({ item, onIncrement, onDecrement, onRemove }
   };
 
   const handleRemove = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    triggerHaptic('medium');
     opacity.value = withTiming(0, { duration: 300 }, () => {
       onRemove(item.id);
     });
