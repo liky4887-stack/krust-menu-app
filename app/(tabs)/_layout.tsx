@@ -38,7 +38,8 @@ function CustomTabBar({ state, navigation }: { state: any; navigation: any }) {
     if (isFocused) {
       navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
     } else {
-      navigation.navigate(route.key);
+      // NOTE: always use route.name (NOT route.key) — route.key includes Expo Router's internal suffix and will fail with "not handled by any navigator" errors
+      navigation.navigate(route.name);
     }
   };
 
