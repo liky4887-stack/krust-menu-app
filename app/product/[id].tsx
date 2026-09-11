@@ -20,20 +20,73 @@ export default function ProductDetailScreen() {
   const isFav = favoriteIds.includes(id);
   const product = products.find((p) => p.id === id);
   const meta = getMeta(id);
-  const addOnProducts = useMemo(() => { if (!meta.addOnIds) return []; return meta.addOnIds.map((aid) => products.find((p) => p.id === aid)).filter((p): p is Product => Boolean(p)); }, [meta.addOnIds]);
+  const addOnProducts = useMemo(() => {
+    if (!meta.addOnIds) return [];
+    return meta.addOnIds
+      .map((aid) => products.find((p) => p.id === aid))
+      .filter((p): p is Product => Boolean(p));
+  }, [meta.addOnIds]);
+
+  const computePrice = useMemo(() => {
+    if (!product) return 0;
+    let total = product.price;
+    if (product.optionGroups) {
+      for (const group of product.optionGroups) {
+        const selectedId = selectedOptions[group.id];
+        if (selectedId) {
+          const opt = group.options.find((o) => o.id === selectedId);
+          if (opt?.price) total += opt.price - product.price;
+        }
+      }
+    }
+    return total;
+  }, [product, selectedOptions]);
 
   if (!product) {
-    return (<SafeAreaView style={styles.safe} edges={['top']}><View style={styles.notFound}><Text style={styles.notFoundText}>المنتج غير موجود</Text><TouchableOpacity onPress={() => router.back()}><Text style={styles.backLink}>العودة</Text></TouchableOpacity></View></SafeAreaView>);
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.notFound}>
+          <Text style={styles.notFoundText}>المنتج غير موجود</Text>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text style={styles.backLink}>العودة</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
   }
 
-  const computePrice = useMemo(() => { let total = product.price; if (product.optionGroups) { for (const group of product.optionGroups) { const selectedId = selectedOptions[group.id]; if (selectedId) { const opt = group.options.find((o) => o.id === selectedId); if (opt?.price) total += opt.price - product.price; } } } return total; }, [product, selectedOptions]);
+  const handleAddToCart = () => {
+    let optionsLabel: string | undefined;
+    if (product.optionGroups) {
+      const labels: string[] = [];
+      for (const group of product.optionGroups) {
+        const selectedId = selectedOptions[group.id];
+        if (selectedId) {
+          const opt = group.options.find((o) => o.id === selectedId);
+          if (opt) labels.push(`${group.label}: ${opt.label}`);
+        }
+      }
+      if (labels.length > 0) optionsLabel = labels.join(' · ');
+    }
+    addItem({ id: product.id, name: product.title, nameEn: product.titleEn, price: computePrice, image: product.emoji, options: optionsLabel });
+    router.back();
+  };
 
-  const handleAddToCart = () => { let optionsLabel: string | undefined; if (product.optionGroups) { const labels: string[] = []; for (const group of product.optionGroups) { const selectedId = selectedOptions[group.id]; if (selectedId) { const opt = group.options.find((o) => o.id === selectedId); if (opt) labels.push(`${group.label}: ${opt.label}`); } } if (labels.length > 0) optionsLabel = labels.join(' · '); } addItem({ id: product.id, name: product.title, nameEn: product.titleEn, price: computePrice, image: product.emoji, options: optionsLabel }); router.back(); };
+  const handleShare = async () => {
+    try { await Share.share({ message: `كرست — ${product.title} (${product.titleEn})\nالسعر: ${product.price.toFixed(2)} د.ل\n${product.description ?? ''}` }); } catch {}
+  };
 
-  const handleShare = async () => { try { await Share.share({ message: `كرست — ${product.title} (${product.titleEn})\nالسعر: ${product.price.toFixed(2)} د.ل\n${product.description ?? ''}` }); } catch {} };
-  const handleAddOn = (addon: Product) => { addItem({ id: addon.id, name: addon.title, nameEn: addon.titleEn, price: addon.price, image: addon.emoji }); };
-  const selectOption = (groupId: string, optionId: string) => { setSelectedOptions((prev) => ({ ...prev, [groupId]: optionId })); };
-  const allRequiredSelected = product.optionGroups ? product.optionGroups.filter((g) => g.required).every((g) => selectedOptions[g.id]) : true;
+  const handleAddOn = (addon: Product) => {
+    addItem({ id: addon.id, name: addon.title, nameEn: addon.titleEn, price: addon.price, image: addon.emoji });
+  };
+
+  const selectOption = (groupId: string, optionId: string) => {
+    setSelectedOptions((prev) => ({ ...prev, [groupId]: optionId }));
+  };
+
+  const allRequiredSelected = product.optionGroups
+    ? product.optionGroups.filter((g) => g.required).every((g) => selectedOptions[g.id])
+    : true;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -56,29 +109,58 @@ export default function ProductDetailScreen() {
             <View style={styles.metaChip}><Clock size={14} color={Colors.PRIMARY} strokeWidth={2} /><Text style={styles.metaText}>وقت التحضير: {meta.prepTime}</Text></View>
             {meta.calories !== undefined && (<View style={styles.metaChip}><Flame size={14} color={Colors.AMBER} strokeWidth={2} /><Text style={styles.metaText}>{meta.calories} سعرة حرارية</Text></View>)}
           </View>
-          <View style={styles.priceRow}><Text style={styles.price}>{computePrice.toFixed(2)} د.ل</Text>{product.originalPrice && product.originalPrice > product.price ? <Text style={styles.originalPrice}>{product.originalPrice.toFixed(2)} د.ل</Text> : null}</View>
+          <View style={styles.priceRow}>
+            <Text style={styles.price}>{computePrice.toFixed(2)} د.ل</Text>
+            {product.originalPrice && product.originalPrice > product.price ? <Text style={styles.originalPrice}>{product.originalPrice.toFixed(2)} د.ل</Text> : null}
+          </View>
           {product.optionGroups?.map((group: ProductOptionGroup) => (
             <View key={group.id} style={styles.optionGroup}>
               <Text style={styles.optionGroupLabel}>{group.label}{group.labelEn ? <Text style={styles.optionGroupLabelEn}> — {group.labelEn}</Text> : null}{group.required ? <Text style={styles.required}> *</Text> : null}</Text>
               <View style={styles.optionsList}>
-                {group.options.map((opt: ProductOption) => { const isSelected = selectedOptions[group.id] === opt.id; return (<Pressable key={opt.id} style={[styles.optionChip, isSelected && styles.optionChipSelected]} onPress={() => selectOption(group.id, opt.id)}><Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>{opt.label}{opt.labelEn ? <Text style={styles.optionTextEn}> — {opt.labelEn}</Text> : null}</Text>{opt.price !== undefined && opt.price !== product.price ? <Text style={[styles.optionPrice, isSelected && styles.optionPriceSelected]}>{opt.price > 0 ? `+${(opt.price - product.price).toFixed(0)} د.ل` : ''}</Text> : null}</Pressable>); })}
+                {group.options.map((opt: ProductOption) => {
+                  const isSelected = selectedOptions[group.id] === opt.id;
+                  return (
+                    <Pressable key={opt.id} style={[styles.optionChip, isSelected && styles.optionChipSelected]} onPress={() => selectOption(group.id, opt.id)}>
+                      <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>{opt.label}{opt.labelEn ? <Text style={styles.optionTextEn}> — {opt.labelEn}</Text> : null}</Text>
+                      {opt.price !== undefined && opt.price !== product.price ? <Text style={[styles.optionPrice, isSelected && styles.optionPriceSelected]}>{opt.price > 0 ? `+${(opt.price - product.price).toFixed(0)} د.ل` : ''}</Text> : null}
+                    </Pressable>
+                  );
+                })}
               </View>
             </View>
           ))}
-          <View style={styles.quantityRow}><Text style={styles.quantityLabel}>الكمية</Text><View style={styles.quantityControls}><TouchableOpacity style={styles.qtyBtn} onPress={() => setQuantity((q) => Math.max(1, q - 1))}><Text style={styles.qtyBtnText}>−</Text></TouchableOpacity><Text style={styles.quantityValue}>{quantity}</Text><TouchableOpacity style={styles.qtyBtn} onPress={() => setQuantity((q) => q + 1)}><Text style={styles.qtyBtnText}>+</Text></TouchableOpacity></View></View>
+          <View style={styles.quantityRow}>
+            <Text style={styles.quantityLabel}>الكمية</Text>
+            <View style={styles.quantityControls}>
+              <TouchableOpacity style={styles.qtyBtn} onPress={() => setQuantity((q) => Math.max(1, q - 1))}><Text style={styles.qtyBtnText}>−</Text></TouchableOpacity>
+              <Text style={styles.quantityValue}>{quantity}</Text>
+              <TouchableOpacity style={styles.qtyBtn} onPress={() => setQuantity((q) => q + 1)}><Text style={styles.qtyBtnText}>+</Text></TouchableOpacity>
+            </View>
+          </View>
           {addOnProducts.length > 0 && (
             <View style={styles.addOnsSection}>
               <Text style={styles.addOnsTitle}>أضف مع طلبك</Text>
               <Text style={styles.addOnsSubtitle}>منتجات تكمل طلبك</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.addOnsScroll}>
-                {addOnProducts.map((addon) => (<TouchableOpacity key={addon.id} style={styles.addOnCard} onPress={() => handleAddOn(addon)} activeOpacity={0.7}><View style={styles.addOnImageArea}><Text style={styles.addOnImageText} numberOfLines={2}>{addon.title}</Text></View><Text style={styles.addOnName} numberOfLines={1}>{addon.title}</Text><Text style={styles.addOnNameEn} numberOfLines={1}>{addon.titleEn}</Text><View style={styles.addOnBottom}><Text style={styles.addOnPrice}>{addon.price.toFixed(2)} د.ل</Text><View style={styles.addOnPlusBtn}><Plus size={14} color={Colors.WHITE} strokeWidth={2.5} /></View></View></TouchableOpacity>))}
+                {addOnProducts.map((addon) => (
+                  <TouchableOpacity key={addon.id} style={styles.addOnCard} onPress={() => handleAddOn(addon)} activeOpacity={0.7}>
+                    <View style={styles.addOnImageArea}><Text style={styles.addOnImageText} numberOfLines={2}>{addon.title}</Text></View>
+                    <Text style={styles.addOnName} numberOfLines={1}>{addon.title}</Text>
+                    <Text style={styles.addOnNameEn} numberOfLines={1}>{addon.titleEn}</Text>
+                    <View style={styles.addOnBottom}><Text style={styles.addOnPrice}>{addon.price.toFixed(2)} د.ل</Text><View style={styles.addOnPlusBtn}><Plus size={14} color={Colors.WHITE} strokeWidth={2.5} /></View></View>
+                  </TouchableOpacity>
+                ))}
               </ScrollView>
             </View>
           )}
         </View>
         <View style={styles.bottomPadding} />
       </ScrollView>
-      <View style={styles.footer}><TouchableOpacity style={[styles.addToCartBtn, !allRequiredSelected && styles.addToCartBtnDisabled]} onPress={handleAddToCart} disabled={!allRequiredSelected} activeOpacity={0.85}><Text style={styles.addToCartText}>{allRequiredSelected ? `أضف إلى السلة · ${(computePrice * quantity).toFixed(2)} د.ل` : 'اختر الخيارات المطلوبة'}</Text></TouchableOpacity></View>
+      <View style={styles.footer}>
+        <TouchableOpacity style={[styles.addToCartBtn, !allRequiredSelected && styles.addToCartBtnDisabled]} onPress={handleAddToCart} disabled={!allRequiredSelected} activeOpacity={0.85}>
+          <Text style={styles.addToCartText}>{allRequiredSelected ? `أضف إلى السلة · ${(computePrice * quantity).toFixed(2)} د.ل` : 'اختر الخيارات المطلوبة'}</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
