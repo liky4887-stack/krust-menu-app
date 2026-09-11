@@ -1,24 +1,28 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View, Text, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Home, ClipboardList, MessageCircle, ShoppingCart } from 'lucide-react-native';
+import { Home, ClipboardList, ShoppingCart } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing } from '@/constants/colors';
 import { useCartStore } from '@/store/useCartStore';
 
 const ACTIVE_COLOR = '#143D33';
 const INACTIVE_COLOR = '#A3A3A3';
 
+type LucideIcon = typeof Home;
+
 interface TabConfig {
   name: string;
   label: string;
-  icon: typeof Home;
+  lucideIcon?: LucideIcon;
+  ioniconName?: keyof typeof Ionicons.glyphMap;
 }
 
 const tabConfigs: TabConfig[] = [
-  { name: 'index', label: 'القائمة', icon: Home },
-  { name: 'orders', label: 'الطلبات', icon: ClipboardList },
-  { name: 'dashpass', label: 'الرسائل', icon: MessageCircle },
-  { name: 'cart', label: 'السلة', icon: ShoppingCart },
+  { name: 'index', label: 'القائمة', lucideIcon: Home },
+  { name: 'orders', label: 'الطلبات', lucideIcon: ClipboardList },
+  { name: 'messages', label: 'الرسائل', ioniconName: 'chatbubbles-outline' },
+  { name: 'cart', label: 'السلة', lucideIcon: ShoppingCart },
 ];
 
 function CustomTabBar({ state, navigation }: { state: any; navigation: any }) {
@@ -51,8 +55,8 @@ function CustomTabBar({ state, navigation }: { state: any; navigation: any }) {
           const config = tabConfigs.find((t) => t.name === route.name);
           if (!config) return null;
 
-          const Icon = config.icon;
           const showBadge = route.name === 'cart' && cartItemCount > 0;
+          const iconColor = isFocused ? ACTIVE_COLOR : INACTIVE_COLOR;
 
           return (
             <TouchableOpacity
@@ -65,12 +69,25 @@ function CustomTabBar({ state, navigation }: { state: any; navigation: any }) {
               accessibilityState={{ selected: isFocused }}
             >
               <View style={styles.iconWrapper}>
-                <Icon
-                  size={24}
-                  color={isFocused ? ACTIVE_COLOR : INACTIVE_COLOR}
-                  strokeWidth={isFocused ? 2.5 : 2}
-                  absoluteStrokeWidth={false}
-                />
+                {config.lucideIcon ? (
+                  (() => {
+                    const Icon = config.lucideIcon!;
+                    return (
+                      <Icon
+                        size={24}
+                        color={iconColor}
+                        strokeWidth={isFocused ? 2.5 : 2}
+                        absoluteStrokeWidth={false}
+                      />
+                    );
+                  })()
+                ) : (
+                  <Ionicons
+                    name={config.ioniconName!}
+                    size={24}
+                    color={iconColor}
+                  />
+                )}
                 {showBadge ? (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>
@@ -106,7 +123,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen name="index" options={{ title: 'القائمة' }} />
       <Tabs.Screen name="orders" options={{ title: 'الطلبات' }} />
-      <Tabs.Screen name="dashpass" options={{ title: 'الرسائل' }} />
+      <Tabs.Screen name="messages" options={{ title: 'الرسائل' }} />
       <Tabs.Screen name="cart" options={{ title: 'السلة' }} />
     </Tabs>
   );
