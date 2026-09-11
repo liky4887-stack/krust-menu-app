@@ -1,22 +1,24 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View, Text, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BlurView } from 'expo-blur';
-import { Coffee, ClipboardList, Gift, ShoppingCart } from 'lucide-react-native';
+import { Home, ClipboardList, MessageCircle, ShoppingCart } from 'lucide-react-native';
 import { Colors, Spacing } from '@/constants/colors';
 import { useCartStore } from '@/store/useCartStore';
 
+const ACTIVE_COLOR = '#143D33';
+const INACTIVE_COLOR = '#A3A3A3';
+
 interface TabConfig {
-  id: string;
   name: string;
-  icon: typeof Coffee;
+  label: string;
+  icon: typeof Home;
 }
 
-const tabs: TabConfig[] = [
-  { id: 'index', name: 'القائمة', icon: Coffee },
-  { id: 'orders', name: 'الطلبات', icon: ClipboardList },
-  { id: 'dashpass', name: 'المكافآت', icon: Gift },
-  { id: 'cart', name: 'السلة', icon: ShoppingCart },
+const tabConfigs: TabConfig[] = [
+  { name: 'index', label: 'القائمة', icon: Home },
+  { name: 'orders', label: 'الطلبات', icon: ClipboardList },
+  { name: 'dashpass', label: 'الرسائل', icon: MessageCircle },
+  { name: 'cart', label: 'السلة', icon: ShoppingCart },
 ];
 
 function CustomTabBar({ state, navigation }: { state: any; navigation: any }) {
@@ -24,11 +26,16 @@ function CustomTabBar({ state, navigation }: { state: any; navigation: any }) {
   const cartItemCount = useCartStore((s) =>
     s.items.reduce((sum, item) => sum + item.quantity, 0)
   );
-  const activeIndex = state.index;
 
-  const handlePress = (index: number) => {
-    const target = tabs[index].id;
-    navigation.navigate(target);
+  const handlePress = (routeName: string) => {
+    const route = state.routes.find((r: any) => r.name === routeName);
+    if (!route) return;
+    const isFocused = state.index === state.routes.indexOf(route);
+    if (isFocused) {
+      navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+    } else {
+      navigation.navigate(route.key);
+    }
   };
 
   return (
@@ -38,28 +45,30 @@ function CustomTabBar({ state, navigation }: { state: any; navigation: any }) {
         { paddingBottom: Math.max(insets.bottom, Spacing.SM) },
       ]}
     >
-      <BlurView intensity={90} tint="light" style={StyleSheet.absoluteFillObject} />
       <View style={styles.inner}>
-        {tabs.map((tab, index) => {
-          const isActive = activeIndex === index;
-          const Icon = tab.icon;
-          const showBadge = tab.id === 'cart' && cartItemCount > 0;
+        {state.routes.map((route: any, index: number) => {
+          const isFocused = state.index === index;
+          const config = tabConfigs.find((t) => t.name === route.name);
+          if (!config) return null;
+
+          const Icon = config.icon;
+          const showBadge = route.name === 'cart' && cartItemCount > 0;
 
           return (
             <TouchableOpacity
-              key={tab.id}
+              key={route.key}
               style={styles.tab}
-              onPress={() => handlePress(index)}
-              activeOpacity={0.7}
+              onPress={() => handlePress(route.name)}
+              activeOpacity={0.6}
               accessibilityRole="button"
-              accessibilityLabel={tab.name}
-              accessibilityState={{ selected: isActive }}
+              accessibilityLabel={config.label}
+              accessibilityState={{ selected: isFocused }}
             >
-              <View style={styles.iconContainer}>
+              <View style={styles.iconWrapper}>
                 <Icon
-                  size={22}
-                  color={isActive ? Colors.PRIMARY : Colors.DARK_GRAY}
-                  strokeWidth={isActive ? 2.5 : 2}
+                  size={24}
+                  color={isFocused ? ACTIVE_COLOR : INACTIVE_COLOR}
+                  strokeWidth={isFocused ? 2.5 : 2}
                   absoluteStrokeWidth={false}
                 />
                 {showBadge ? (
@@ -73,12 +82,11 @@ function CustomTabBar({ state, navigation }: { state: any; navigation: any }) {
               <Text
                 style={[
                   styles.label,
-                  isActive && styles.labelActive,
+                  isFocused && styles.labelActive,
                 ]}
               >
-                {tab.name}
+                {config.label}
               </Text>
-              {isActive ? <View style={styles.indicator} /> : null}
             </TouchableOpacity>
           );
         })}
@@ -98,7 +106,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen name="index" options={{ title: 'القائمة' }} />
       <Tabs.Screen name="orders" options={{ title: 'الطلبات' }} />
-      <Tabs.Screen name="dashpass" options={{ title: 'المكافآت' }} />
+      <Tabs.Screen name="dashpass" options={{ title: 'الرسائل' }} />
       <Tabs.Screen name="cart" options={{ title: 'السلة' }} />
     </Tabs>
   );
@@ -110,15 +118,19 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(255,255,255,0.92)',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: Colors.BORDER,
+    borderTopColor: '#F0F0F0',
     paddingTop: Spacing.SM,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    overflow: 'hidden',
     ...Platform.select({
-      ios: { shadowColor: '#0A1B2A', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.08, shadowRadius: 12 },
+      ios: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 12,
+      },
       android: { elevation: 8 },
     }),
   },
@@ -132,10 +144,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: Spacing.XS + 2,
-    gap: 3,
+    gap: 4,
   },
-  iconContainer: {
-    position: 'relative',
+  iconWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
     width: 28,
@@ -143,35 +154,30 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: 'absolute',
-    top: -6,
-    right: -10,
-    minWidth: 17,
-    height: 17,
-    borderRadius: 8.5,
+    top: -4,
+    right: -8,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: Colors.RED_500,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   badgeText: {
-    color: Colors.WHITE,
-    fontSize: 10,
+    color: '#FFFFFF',
+    fontSize: 9,
     fontWeight: '700',
   },
   label: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '500',
-    color: Colors.DARK_GRAY,
+    color: INACTIVE_COLOR,
   },
   labelActive: {
-    color: Colors.PRIMARY,
+    color: ACTIVE_COLOR,
     fontWeight: '700',
-  },
-  indicator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.PRIMARY,
-    marginTop: 2,
   },
 });

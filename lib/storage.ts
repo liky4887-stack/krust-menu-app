@@ -58,7 +58,7 @@ try {
     },
   };
 } catch {
-  // AsyncStorage not installed — use in-memory fallback
+  // AsyncStorage not installed
 }
 
 const syncCache: Record<string, string> = {};
