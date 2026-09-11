@@ -11,16 +11,15 @@ import { FulfillmentType } from '@/store/useOrdersStore';
 export default function CheckoutScreen() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
+  const clearCart = useCartStore((s) => s.clearCart);
   const profile = useCustomerStore((s) => s.profile);
   const setProfile = useCustomerStore((s) => s.setProfile);
-
   const [name, setName] = useState(profile?.name ?? '');
   const [phone, setPhone] = useState(profile?.phone ?? '');
   const [address, setAddress] = useState(profile?.address ?? '');
   const [fulfillment, setFulfillment] = useState<FulfillmentType>('pickup');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
-
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const tax = subtotal * 0.08;
   const total = subtotal + tax;
@@ -29,14 +28,9 @@ export default function CheckoutScreen() {
     const e: Record<string, string> = {};
     if (!name.trim()) e.name = 'الرجاء إدخال الاسم';
     const phoneClean = phone.replace(/\s/g, '');
-    if (!phoneClean) {
-      e.phone = 'الرجاء إدخال رقم الهاتف';
-    } else if (!/^09\d{8}$/.test(phoneClean)) {
-      e.phone = 'رقم الهاتف يجب أن يبدأ بـ 09 ويتكون من 10 أرقام';
-    }
-    if (fulfillment === 'delivery' && !address.trim()) {
-      e.address = 'الرجاء إدخال عنوان التوصيل';
-    }
+    if (!phoneClean) { e.phone = 'الرجاء إدخال رقم الهاتف'; }
+    else if (!/^09\d{8}$/.test(phoneClean)) { e.phone = 'رقم الهاتف يجب أن يبدأ بـ 09 ويتكون من 10 أرقام'; }
+    if (fulfillment === 'delivery' && !address.trim()) { e.address = 'الرجاء إدخال عنوان التوصيل'; }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -81,13 +75,13 @@ export default function CheckoutScreen() {
                 <Store size={26} color={fulfillment === 'pickup' ? Colors.PRIMARY : Colors.DARK_GRAY} strokeWidth={2} />
                 <Text style={[styles.fulfillmentLabel, fulfillment === 'pickup' && styles.fulfillmentLabelActive]}>استلام من الفرع</Text>
                 <Text style={styles.fulfillmentDesc}>احضر إلى المتجر واستلم طلبك</Text>
-                {fulfillment === 'pickup' && (<View style={styles.fulfillmentCheck}><Check size={14} color={Colors.WHITE} strokeWidth={3} /></View>)}
+                {fulfillment === 'pickup' && <View style={styles.fulfillmentCheck}><Check size={14} color={Colors.WHITE} strokeWidth={3} /></View>}
               </TouchableOpacity>
               <TouchableOpacity style={[styles.fulfillmentCard, fulfillment === 'delivery' && styles.fulfillmentCardActive]} onPress={() => setFulfillment('delivery')} activeOpacity={0.7}>
                 <Bike size={26} color={fulfillment === 'delivery' ? Colors.PRIMARY : Colors.DARK_GRAY} strokeWidth={2} />
                 <Text style={[styles.fulfillmentLabel, fulfillment === 'delivery' && styles.fulfillmentLabelActive]}>توصيل</Text>
                 <Text style={styles.fulfillmentDesc}>يوصلك الطلب إلى عنوانك</Text>
-                {fulfillment === 'delivery' && (<View style={styles.fulfillmentCheck}><Check size={14} color={Colors.WHITE} strokeWidth={3} /></View>)}
+                {fulfillment === 'delivery' && <View style={styles.fulfillmentCheck}><Check size={14} color={Colors.WHITE} strokeWidth={3} /></View>}
               </TouchableOpacity>
             </View>
           </View>
@@ -103,18 +97,25 @@ export default function CheckoutScreen() {
               <TextInput style={styles.input} placeholder="رقم الهاتف (09xxxxxxxx)" placeholderTextColor={Colors.DARK_GRAY} value={phone} onChangeText={(v) => { setPhone(v); if (submitted) validate(); }} textAlign="right" keyboardType="phone-pad" textContentType="telephoneNumber" maxLength={10} />
             </View>
             {submitted && errors.phone ? <Text style={styles.errorText}>{errors.phone}</Text> : null}
-            {fulfillment === 'delivery' && (<>
-              <View style={styles.inputGroup}>
-                <View style={styles.inputIcon}><MapPin size={18} color={Colors.DARK_GRAY} strokeWidth={2} /></View>
-                <TextInput style={[styles.input, styles.inputMultiline]} placeholder="عنوان التوصيل" placeholderTextColor={Colors.DARK_GRAY} value={address} onChangeText={(v) => { setAddress(v); if (submitted) validate(); }} textAlign="right" multiline textContentType="fullStreetAddress" />
-              </View>
-              {submitted && errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
-            </>)}
+            {fulfillment === 'delivery' && (
+              <>
+                <View style={styles.inputGroup}>
+                  <View style={styles.inputIcon}><MapPin size={18} color={Colors.DARK_GRAY} strokeWidth={2} /></View>
+                  <TextInput style={[styles.input, styles.inputMultiline]} placeholder="عنوان التوصيل" placeholderTextColor={Colors.DARK_GRAY} value={address} onChangeText={(v) => { setAddress(v); if (submitted) validate(); }} textAlign="right" multiline textContentType="fullStreetAddress" />
+                </View>
+                {submitted && errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
+              </>
+            )}
           </View>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>ملخص الطلب</Text>
             <View style={styles.summaryCard}>
-              {items.map((item) => (<View key={item.id + (item.options ?? '')} style={styles.summaryRow}><Text style={styles.summaryItem}>{item.name} × {item.quantity}</Text><Text style={styles.summaryPrice}>{(item.price * item.quantity).toFixed(2)} د.ل</Text></View>))}
+              {items.map((item) => (
+                <View key={item.id + (item.options ?? '')} style={styles.summaryRow}>
+                  <Text style={styles.summaryItem}>{item.name} × {item.quantity}</Text>
+                  <Text style={styles.summaryPrice}>{(item.price * item.quantity).toFixed(2)} د.ل</Text>
+                </View>
+              ))}
               <View style={styles.summaryDivider} />
               <View style={styles.summaryRow}><Text style={styles.summaryLabel}>المجموع الفرعي</Text><Text style={styles.summaryValue}>{subtotal.toFixed(2)} د.ل</Text></View>
               <View style={styles.summaryRow}><Text style={styles.summaryLabel}>الضريبة (٨٪)</Text><Text style={styles.summaryValue}>{tax.toFixed(2)} د.ل</Text></View>
