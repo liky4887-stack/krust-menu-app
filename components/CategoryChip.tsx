@@ -1,19 +1,11 @@
-/**
- * CategoryChip - Animated category selection chip
- */
-
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
-import colors from "@/src/design-tokens/colors";
-import typography from "@/src/design-tokens/typography";
-import { space } from "@/src/design-tokens/spacing";
-import { borderRadius } from "@/src/design-tokens/border-radius";
+import { Colors, Radius, Spacing } from '@/constants/colors';
 import { Category } from '@/constants/mockData';
-import * as Haptics from 'expo-haptics';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -28,7 +20,10 @@ export default function CategoryChip({ category, selected = false, onPress }: Ca
 
   const handlePressIn = () => {
     scale.value = withSpring(0.92, { damping: 10, stiffness: 200 });
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== 'web') {
+      const Haptics = require('expo-haptics');
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
   };
 
   const handlePressOut = () => {
@@ -60,25 +55,28 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.neutral[100],
-    paddingHorizontal: space.md,
-    paddingVertical: space.sm,
-    borderRadius: borderRadius.pill,
-    marginLeft: space.sm,
+    backgroundColor: Colors.WHITE,
+    paddingHorizontal: Spacing.MD,
+    paddingVertical: Spacing.SM + 2,
+    borderRadius: Radius.MD,
+    marginLeft: Spacing.SM,
+    borderWidth: 1,
+    borderColor: Colors.LIGHT_GRAY,
   },
   selected: {
-    backgroundColor: colors.primary[500],
+    backgroundColor: Colors.PRIMARY,
+    borderColor: Colors.PRIMARY,
   },
   emoji: {
-    fontSize: typography.fontSize.base,
-    marginLeft: space.sm,
+    fontSize: 14,
+    marginLeft: Spacing.XS,
   },
   label: {
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.medium,
-    color: colors.neutral[900],
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.BLACK,
   },
   labelSelected: {
-    color: colors.text.inverse,
+    color: Colors.WHITE,
   },
 });

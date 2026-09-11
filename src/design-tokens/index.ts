@@ -14,4 +14,11 @@ export { shadows } from './shadows';
 export { borderRadius } from './border-radius';
 export { fontFamily, fontSize, fontWeight, lineHeight } from './typography';
 
-export default { colors, typography, space, spacing, shadows, borderRadius };
+export default {
+  colors,
+  typography,
+  space,
+  spacing,
+  shadows,
+  borderRadius,
+};

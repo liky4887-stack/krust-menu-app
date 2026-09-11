@@ -1,5 +1,6 @@
 /**
  * Design Tokens - Spacing
+ * 8px base unit
  */
 
 export const spacing = {
@@ -7,14 +8,7 @@ export const spacing = {
 };
 
 export const space = {
-  xs: spacing[1],
-  sm: spacing[2],
-  md: spacing[4],
-  lg: spacing[5],
-  xl: spacing[6],
-  '2xl': spacing[8],
-  '3xl': spacing[10],
-  '4xl': spacing[12],
+  xs: spacing[1], sm: spacing[2], md: spacing[4], lg: spacing[5], xl: spacing[6], '2xl': spacing[8], '3xl': spacing[10], '4xl': spacing[12],
 };
 
 export default { spacing, space };
