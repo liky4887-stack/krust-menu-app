@@ -5,12 +5,17 @@ import { useRouter } from 'expo-router';
 import { Colors, Spacing, Radius } from '@/constants/colors';
 import { useOrdersStore, Order } from '@/store/useOrdersStore';
 import { useCartStore } from '@/store/useCartStore';
+import { products } from '@/constants/mockData';
 
-const paymentLabels: Record<string, string> = { sedad: 'سداد', edfaely: 'ادفعلي', cash: 'الدفع عند الاستلام' };
+const paymentLabels: Record<string, string> = {
+  sedad: 'سداد',
+  edfaely: 'ادفعلي',
+  cash: 'الدفع عند الاستلام',
+};
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
-  const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
   return `${d.getDate()} ${months[d.getMonth()] ?? ''}`;
 }
 
@@ -20,7 +25,9 @@ export default function OrdersScreen() {
   const addItem = useCartStore((s) => s.addItem);
 
   const handleReorder = (order: Order) => {
-    order.items.forEach((item) => { addItem({ id: item.id, name: item.name, nameEn: item.nameEn, price: item.price, image: item.image, options: item.options }); });
+    order.items.forEach((item) => {
+      addItem({ id: item.id, name: item.name, nameEn: item.nameEn, price: item.price, image: item.image, options: item.options });
+    });
     router.navigate('/(tabs)/cart');
   };
 
@@ -64,7 +71,9 @@ export default function OrdersScreen() {
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>لا توجد طلبات سابقة</Text>
           <Text style={styles.emptySubtitle}>ابدأ بطلب أول كوب من كرست</Text>
-          <TouchableOpacity style={styles.emptyBtn} onPress={() => router.navigate('/')} activeOpacity={0.85}><Text style={styles.emptyBtnText}>تصفح القائمة</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.emptyBtn} onPress={() => router.navigate('/')} activeOpacity={0.85}>
+            <Text style={styles.emptyBtnText}>تصفح القائمة</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
