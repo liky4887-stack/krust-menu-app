@@ -1,5 +1,6 @@
 /**
  * Design Tokens - Barrel Export
+ * Centralized exports for all design tokens
  */
 
 import colors from './colors';

@@ -1,5 +1,6 @@
 /**
  * Design Tokens - Border Radius
+ * Consistent rounded corners throughout the app
  */
 
 export const borderRadius = {
@@ -9,8 +10,8 @@ export const borderRadius = {
   lg: 12,
   xl: 16,
   xxl: 20,
-  pill: 9999,
-  circle: 9999,
+  pill: 9999, // Effectively infinite for fully rounded elements
+  circle: 9999, // For circular avatars/icons,
 };
 
 export default borderRadius;

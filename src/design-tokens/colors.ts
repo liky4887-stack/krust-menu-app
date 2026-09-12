@@ -3,19 +3,21 @@
  * Krust blue & white palette
  */
 
+// Primary brand colors (Krust blue family)
 export const primary = {
   50: '#EEF4FB',
   100: '#D6E4F0',
   200: '#A8C8E5',
   300: '#7AABD9',
   400: '#4A8AC9',
-  500: '#1A5DAB',
+  500: '#1A5DAB', // Main Krust blue
   600: '#0F4C8A',
   700: '#0A3A6E',
   800: '#072A52',
   900: '#041A36',
 };
 
+// Neutral colors (grays, blacks, whites)
 export const neutral = {
   50: '#FAFCFF',
   100: '#F0F6FF',
@@ -29,6 +31,7 @@ export const neutral = {
   900: '#0A1B2A',
 };
 
+// Semantic colors
 export const semantic = {
   success: '#059669',
   warning: '#F5A623',
@@ -37,6 +40,7 @@ export const semantic = {
   disabled: '#A0B8D0',
 };
 
+// Background colors
 export const background = {
   primary: '#FFFFFF',
   secondary: '#F0F6FF',
@@ -44,6 +48,7 @@ export const background = {
   elevated: '#FFFFFF',
 };
 
+// Text colors
 export const text = {
   primary: '#0A1B2A',
   secondary: '#5A7A9A',
@@ -53,6 +58,7 @@ export const text = {
   link: '#1A5DAB',
 };
 
+// Border colors
 export const border = {
   light: '#E0EBF7',
   medium: '#D6E4F0',
