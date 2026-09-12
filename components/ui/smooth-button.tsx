@@ -6,10 +6,26 @@ import { Colors, Radius } from '@/constants/colors';
 
 const smoothButtonVariants = cva('', {
   variants: {
-    variant: { default: {}, destructive: {}, outline: {}, secondary: {}, ghost: {}, link: {}, candy: {} },
-    size: { default: {}, sm: {}, lg: {}, icon: {} },
+    variant: {
+      default: {},
+      destructive: {},
+      outline: {},
+      secondary: {},
+      ghost: {},
+      link: {},
+      candy: {},
+    },
+    size: {
+      default: {},
+      sm: {},
+      lg: {},
+      icon: {},
+    },
   },
-  defaultVariants: { variant: 'default', size: 'default' },
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+  },
 });
 
 export type SmoothButtonProps = {
@@ -40,33 +56,82 @@ const variantStyles: Record<string, { backgroundColor: string; borderWidth: numb
 };
 
 const textColorForVariant: Record<string, string> = {
-  default: Colors.WHITE, destructive: Colors.WHITE, outline: Colors.BLACK, secondary: Colors.BLACK, ghost: Colors.BLACK, link: Colors.PRIMARY, candy: Colors.WHITE,
+  default: Colors.WHITE,
+  destructive: Colors.WHITE,
+  outline: Colors.BLACK,
+  secondary: Colors.BLACK,
+  ghost: Colors.BLACK,
+  link: Colors.PRIMARY,
+  candy: Colors.WHITE,
 };
 
-export default function SmoothButton({ variant = 'default', size = 'default', children, onPress, disabled, style, ...props }: SmoothButtonProps) {
+export default function SmoothButton({
+  variant = 'default',
+  size = 'default',
+  children,
+  onPress,
+  disabled,
+  style,
+  ...props
+}: SmoothButtonProps) {
   const scale = useSharedValue(1);
   const sizeStyle = sizeStyles[size || 'default'] || sizeStyles.default;
   const variantStyle = variantStyles[variant || 'default'] || variantStyles.default;
   const textColor = textColorForVariant[variant || 'default'] || Colors.WHITE;
 
-  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
-  const handlePressIn = () => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); };
-  const handlePressOut = () => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); };
+  const handlePressIn = () => {
+    scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+  };
 
   return (
     <Animated.View style={animatedStyle}>
-      <TouchableOpacity onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut} disabled={disabled} activeOpacity={0.85} style={[styles.base, sizeStyle, variantStyle, disabled && styles.disabled, style]} {...props}>
-        {typeof children === 'string' ? <Text style={[styles.text, { color: textColor }]}>{children}</Text> : children}
+      <TouchableOpacity
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={disabled}
+        activeOpacity={0.85}
+        style={[
+          styles.base,
+          sizeStyle,
+          variantStyle,
+          disabled && styles.disabled,
+          style,
+        ]}
+        {...props}
+      >
+        {typeof children === 'string' ? (
+          <Text style={[styles.text, { color: textColor }]}>{children}</Text>
+        ) : (
+          children
+        )}
       </TouchableOpacity>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  base: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  text: { fontSize: 14, fontWeight: '600' },
-  disabled: { opacity: 0.5 },
+  base: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  disabled: {
+    opacity: 0.5,
+  },
 });
 
 export { smoothButtonVariants };

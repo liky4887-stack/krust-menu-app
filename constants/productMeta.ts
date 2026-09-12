@@ -5,6 +5,7 @@ export interface ProductMeta {
 }
 
 export const productMeta: Record<string, ProductMeta> = {
+  // Hot Drinks
   h1: { prepTime: '5 دقائق', calories: 180, addOnIds: ['kro1', 'bag1'] },
   h2: { prepTime: '5 دقائق', calories: 220, addOnIds: ['kro2', 'bag2'] },
   h3: { prepTime: '5 دقائق', calories: 200, addOnIds: ['kro4', 'sand1'] },
@@ -13,6 +14,7 @@ export const productMeta: Record<string, ProductMeta> = {
   h6: { prepTime: '4 دقائق', calories: 160, addOnIds: ['kro3', 'sand2'] },
   h7: { prepTime: '4 دقائق', calories: 170, addOnIds: ['kro1', 'bag3'] },
   h8: { prepTime: '5 دقائق', calories: 210, addOnIds: ['kro6', 'bag1'] },
+  // Cold Drinks
   c1: { prepTime: '4 دقائق', calories: 190, addOnIds: ['kro2', 'bag1'] },
   c2: { prepTime: '4 دقائق', calories: 230, addOnIds: ['kro1', 'sand1'] },
   c3: { prepTime: '5 دقائق', calories: 250, addOnIds: ['kro4', 'bag2'] },
@@ -24,12 +26,15 @@ export const productMeta: Record<string, ProductMeta> = {
   c9: { prepTime: '4 دقائق', calories: 210, addOnIds: ['kro6', 'sand2'] },
   c10: { prepTime: '2 دقائق', calories: 80, addOnIds: ['kro1', 'bag1'] },
   c11: { prepTime: '2 دقائق', calories: 60, addOnIds: ['kro2', 'sand1'] },
+  // Sugar-Free
   sf1: { prepTime: '4 دقائق', calories: 90, addOnIds: ['kro4', 'sand2'] },
   sf2: { prepTime: '4 دقائق', calories: 90, addOnIds: ['kro1', 'bag1'] },
   sf3: { prepTime: '4 دقائق', calories: 80, addOnIds: ['kro2', 'bag3'] },
+  // Mojitos
   m1: { prepTime: '5 دقائق', calories: 120, addOnIds: ['kro1', 'sand1'] },
   sfm1: { prepTime: '5 دقائق', calories: 60, addOnIds: ['kro2', 'sand2'] },
   sfm2: { prepTime: '5 دقائق', calories: 65, addOnIds: ['kro1', 'bag1'] },
+  // Milkshakes
   mk1: { prepTime: '4 دقائق', calories: 380, addOnIds: ['kro2', 'bag2'] },
   mk2: { prepTime: '4 دقائق', calories: 340, addOnIds: ['kro1', 'sand1'] },
   mk3: { prepTime: '4 دقائق', calories: 360, addOnIds: ['kro4', 'bag3'] },
@@ -38,11 +43,14 @@ export const productMeta: Record<string, ProductMeta> = {
   mk6: { prepTime: '4 دقائق', calories: 320, addOnIds: ['kro1', 'sand1'] },
   mk7: { prepTime: '4 دقائق', calories: 350, addOnIds: ['kro2', 'bag2'] },
   mk8: { prepTime: '4 دقائق', calories: 410, addOnIds: ['kro4', 'bag3'] },
+  // Sandwiches
   sand1: { prepTime: '7 دقائق', calories: 280, addOnIds: ['h1', 'c10'] },
   sand2: { prepTime: '7 دقائق', calories: 320, addOnIds: ['h2', 'c1'] },
+  // Bagels
   bag1: { prepTime: '6 دقائق', calories: 350, addOnIds: ['h1', 'c2'] },
   bag2: { prepTime: '6 دقائق', calories: 380, addOnIds: ['h2', 'c1'] },
   bag3: { prepTime: '6 دقائق', calories: 360, addOnIds: ['h3', 'c4'] },
+  // Kroffles
   kro1: { prepTime: '5 دقائق', calories: 290, addOnIds: ['h1', 'c2'] },
   kro2: { prepTime: '5 دقائق', calories: 300, addOnIds: ['h2', 'c1'] },
   kro3: { prepTime: '5 دقائق', calories: 320, addOnIds: ['h3', 'c4'] },
@@ -51,9 +59,11 @@ export const productMeta: Record<string, ProductMeta> = {
   kro6: { prepTime: '5 دقائق', calories: 270, addOnIds: ['h6', 'c7'] },
   kro7: { prepTime: '6 دقائق', calories: 340, addOnIds: ['h7', 'c8'] },
   kro8: { prepTime: '6 دقائق', calories: 330, addOnIds: ['h8', 'c9'] },
+  // Iced Tea
   tea1: { prepTime: '3 دقائق', calories: 90, addOnIds: ['kro1', 'sand1'] },
   tea2: { prepTime: '3 دقائق', calories: 85, addOnIds: ['kro2', 'sand2'] },
   tea3: { prepTime: '3 دقائق', calories: 70, addOnIds: ['kro1', 'bag1'] },
+  // Matcha
   ma1: { prepTime: '5 دقائق', calories: 150, addOnIds: ['kro2', 'bag2'] },
   ma2: { prepTime: '5 دقائق', calories: 140, addOnIds: ['kro1', 'sand1'] },
   ma3: { prepTime: '5 دقائق', calories: 120, addOnIds: ['kro4', 'bag3'] },
