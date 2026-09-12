@@ -40,9 +40,11 @@ const fallbackStorage = {
 
 let nativeStorage: typeof webStorage | null = null;
 try {
+  // AsyncStorage is async but zustand persist handles Promise-based storage
   const AsyncStorage = require('@react-native-async-storage/async-storage').default;
   nativeStorage = {
     getItem: (name: string): string | null => {
+      // Return null synchronously; zustand persist will hydrate when the Promise resolves
       AsyncStorage.getItem(name).then((v: string | null) => {
         if (v !== null) syncCache[name] = v;
       }).catch(() => {});
@@ -58,7 +60,7 @@ try {
     },
   };
 } catch {
-  // AsyncStorage not installed
+  // AsyncStorage not installed — use in-memory fallback
 }
 
 const syncCache: Record<string, string> = {};
