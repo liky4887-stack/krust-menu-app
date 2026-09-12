@@ -44,6 +44,7 @@ export interface Product {
   description?: string;
   descriptionEn?: string;
   optionGroups?: ProductOptionGroup[];
+  imageUrl?: string;
 }
 
 export const categories: Category[] = [
@@ -59,6 +60,7 @@ export const categories: Category[] = [
   { id: 'matcha', label: 'ماتشا', labelEn: 'Matcha', emoji: '🍵' },
 ];
 
+// Mojito base options
 const mojitoBases: ProductOption[] = [
   { id: 'redbull', label: 'ريدبول', labelEn: 'Redbull', price: 20 },
   { id: 'maxfly', label: 'ماكس فلاي', labelEn: 'Max Fly', price: 18 },
@@ -78,85 +80,143 @@ const mojitoFlavors: ProductOption[] = [
 ];
 
 const mojitoOptionGroups: ProductOptionGroup[] = [
-  { id: 'base', label: 'الأساس', labelEn: 'Base', required: true, multiSelect: false, options: mojitoBases },
-  { id: 'flavor', label: 'النكهة', labelEn: 'Flavor', required: true, multiSelect: false, options: mojitoFlavors },
+  {
+    id: 'base',
+    label: 'الأساس',
+    labelEn: 'Base',
+    required: true,
+    multiSelect: false,
+    options: mojitoBases,
+  },
+  {
+    id: 'flavor',
+    label: 'النكهة',
+    labelEn: 'Flavor',
+    required: true,
+    multiSelect: false,
+    options: mojitoFlavors,
+  },
 ];
 
+// Sugar-free mojito flavor options
 const sugarFreeMojitoOptionGroups: ProductOptionGroup[] = [
-  { id: 'flavor', label: 'النكهة', labelEn: 'Flavor', required: true, multiSelect: false, options: [
-    { id: 'peach', label: 'خوخ', labelEn: 'Peach', price: 16 },
-    { id: 'strawberry', label: 'فراولة', labelEn: 'Strawberry', price: 16 },
-  ]},
+  {
+    id: 'flavor',
+    label: 'النكهة',
+    labelEn: 'Flavor',
+    required: true,
+    multiSelect: false,
+    options: [
+      { id: 'peach', label: 'خوخ', labelEn: 'Peach', price: 16 },
+      { id: 'strawberry', label: 'فراولة', labelEn: 'Strawberry', price: 16 },
+    ],
+  },
 ];
 
 const sandwichBreadOptions: ProductOptionGroup[] = [
-  { id: 'bread', label: 'نوع الخبز', labelEn: 'Bread', required: true, multiSelect: false, options: [
-    { id: 'barley', label: 'شعير', labelEn: 'Barley', price: 10 },
-    { id: 'oat', label: 'شوفان', labelEn: 'Oat', price: 12 },
-    { id: 'classic', label: 'خبزة عادية', labelEn: 'Classic bread', price: 10 },
-  ]},
+  {
+    id: 'bread',
+    label: 'نوع الخبز',
+    labelEn: 'Bread',
+    required: true,
+    multiSelect: false,
+    options: [
+      { id: 'barley', label: 'شعير', labelEn: 'Barley', price: 10 },
+      { id: 'oat', label: 'شوفان', labelEn: 'Oat', price: 12 },
+      { id: 'classic', label: 'خبزة عادية', labelEn: 'Classic bread', price: 10 },
+    ],
+  },
 ];
 
+// Sugar-free latte temperature options
 const sugarFreeOptionGroups: ProductOptionGroup[] = [
-  { id: 'temperature', label: 'الحرارة', labelEn: 'Temperature', required: true, multiSelect: false, options: [
-    { id: 'hot', label: 'ساخن', labelEn: 'Hot', price: 10 },
-    { id: 'cold', label: 'بارد', labelEn: 'Cold', price: 15 },
-  ]},
+  {
+    id: 'temperature',
+    label: 'الحرارة',
+    labelEn: 'Temperature',
+    required: true,
+    multiSelect: false,
+    options: [
+      { id: 'hot', label: 'ساخن', labelEn: 'Hot', price: 10 },
+      { id: 'cold', label: 'بارد', labelEn: 'Cold', price: 15 },
+    ],
+  },
 ];
 
 export const products: Product[] = [
-  { id: 'h1', title: 'سبانش لاتيه', titleEn: 'Spanish Latte', price: 12, rating: 5, badge: 'الأكثر طلبًا', emoji: '☕', categoryId: 'hot', description: 'لاتيه إسباني غني بنكهة الحليب المكثف', descriptionEn: 'Rich Spanish latte with condensed milk' },
-  { id: 'h2', title: 'كرست سالتد كاراميل', titleEn: 'Krust Salted Caramel', price: 14, rating: 5, badge: 'جديد', emoji: '☕', categoryId: 'hot', description: 'لاتيه بالكراميل المملح', descriptionEn: 'Salted caramel latte' },
-  { id: 'h3', title: 'بستاشيو لاتيه', titleEn: 'Pistachio Latte', price: 14, rating: 5, badge: 'الأكثر طلبًا', emoji: '☕', categoryId: 'hot', description: 'لاتيه بالفستق الحلبي', descriptionEn: 'Pistachio latte' },
-  { id: 'h4', title: 'سينابون لاتيه', titleEn: 'Cinnabon Latte', price: 12, rating: 4.5, emoji: '☕', categoryId: 'hot', description: 'لاتيه بنكهة القرفة', descriptionEn: 'Cinnamon latte' },
-  { id: 'h5', title: 'وايت شوكولات لاتيه', titleEn: 'White Chocolate Latte', price: 14, rating: 5, emoji: '☕', categoryId: 'hot', description: 'لاتيه بالشوكولاتة البيضاء', descriptionEn: 'White chocolate latte' },
-  { id: 'h6', title: 'فانيليا لاتيه', titleEn: 'Vanilla Latte', price: 10, rating: 4.5, emoji: '☕', categoryId: 'hot', description: 'لاتيه بالفانيليا', descriptionEn: 'Vanilla latte' },
-  { id: 'h7', title: 'لاتيه بندق', titleEn: 'Hazelnut Latte', price: 10, rating: 4.5, emoji: '☕', categoryId: 'hot', description: 'لاتيه بالبندق', descriptionEn: 'Hazelnut latte' },
-  { id: 'h8', title: 'جنجر بريد لاتيه', titleEn: 'Gingerbread Latte', price: 14, rating: 5, badge: 'جديد', emoji: '☕', categoryId: 'hot', description: 'لاتيه بجنجر الخبز', descriptionEn: 'Gingerbread latte' },
-  { id: 'c1', title: 'إيس سبانش لاتيه', titleEn: 'Ice Spanish Latte', price: 17, rating: 5, badge: 'الأكثر طلبًا', emoji: '🧊', categoryId: 'cold', description: 'لاتيه إسباني بارد', descriptionEn: 'Iced Spanish latte' },
-  { id: 'c2', title: 'إيس سالتد كاراميل', titleEn: 'Ice Salted Caramel Latte', price: 20, rating: 5, badge: 'الأكثر طلبًا', emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالكراميل المملح', descriptionEn: 'Iced salted caramel latte' },
-  { id: 'c3', title: 'إيس وايت شوكولات راسبيري', titleEn: 'Ice White Chocolate Raspberry', price: 22, rating: 5, badge: 'جديد', emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالشوكولاتة البيضاء والتوت', descriptionEn: 'Iced white chocolate raspberry' },
-  { id: 'c4', title: 'إيس بستاشيو لاتيه', titleEn: 'Ice Pistachio Latte', price: 17, rating: 5, emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالفستق', descriptionEn: 'Iced pistachio latte' },
-  { id: 'c5', title: 'إيس سينابون لاتيه', titleEn: 'Ice Cinnabon Latte', price: 17, rating: 4.5, emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالقرفة', descriptionEn: 'Iced Cinnabon latte' },
-  { id: 'c6', title: 'إيس وايت شوكولات لاتيه', titleEn: 'Ice White Chocolate Latte', price: 18, rating: 5, emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالشوكولاتة البيضاء', descriptionEn: 'Iced white chocolate latte' },
-  { id: 'c7', title: 'إيس فانيليا لاتيه', titleEn: 'Ice Vanilla Latte', price: 15, rating: 4.5, emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالفانيليا', descriptionEn: 'Iced vanilla latte' },
-  { id: 'c8', title: 'إيس لاتيه بندق', titleEn: 'Ice Hazelnut Latte', price: 15, rating: 4.5, emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالبندق', descriptionEn: 'Iced hazelnut latte' },
-  { id: 'c9', title: 'إيس جنجر لاتيه', titleEn: 'Ice Ginger Latte', price: 17, rating: 5, badge: 'جديد', emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالجنجر', descriptionEn: 'Iced ginger latte' },
-  { id: 'c10', title: 'إيس أمريكانو', titleEn: 'Ice Americano', price: 10, rating: 4.5, emoji: '🧊', categoryId: 'cold', description: 'أمريكانو بارد', descriptionEn: 'Iced Americano' },
-  { id: 'c11', title: 'إيس فلتر كوفي', titleEn: 'Ice Filter Coffee', price: 6, rating: 4, emoji: '🧊', categoryId: 'cold', description: 'قهوة فلتر باردة', descriptionEn: 'Iced filter coffee' },
-  { id: 'sf1', title: 'لاتيه بندق', titleEn: 'Hazelnut Latte', price: 10, rating: 5, badge: 'خالٍ من السكر', emoji: '🥛', categoryId: 'sugarfree', description: 'لاتيه بالبندق خالٍ من السكر', descriptionEn: 'Sugar-free hazelnut latte', optionGroups: sugarFreeOptionGroups },
-  { id: 'sf2', title: 'لاتيه كراميل', titleEn: 'Caramel Latte', price: 10, rating: 5, badge: 'خالٍ من السكر', emoji: '🥛', categoryId: 'sugarfree', description: 'لاتيه بالكراميل خالٍ من السكر', descriptionEn: 'Sugar-free caramel latte', optionGroups: sugarFreeOptionGroups },
-  { id: 'sf3', title: 'لاتيه فانيليا', titleEn: 'Vanilla Latte', price: 10, rating: 4.5, badge: 'خالٍ من السكر', emoji: '🥛', categoryId: 'sugarfree', description: 'لاتيه بالفانيليا خالٍ من السكر', descriptionEn: 'Sugar-free vanilla latte', optionGroups: sugarFreeOptionGroups },
-  { id: 'm1', title: 'موهيتو', titleEn: 'Mojito', price: 16, rating: 5, badge: 'الأكثر طلبًا', emoji: '🍹', categoryId: 'mojito', description: 'موهيتو منعش باختيار الأساس والنكهة', descriptionEn: 'Refreshing mojito — choose base & flavor', optionGroups: mojitoOptionGroups },
-  { id: 'mk1', title: 'ميلك شيك نوتيلا', titleEn: 'Nutella Milkshake', price: 25, rating: 5, badge: 'الأكثر طلبًا', emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالنوتيلا', descriptionEn: 'Nutella milkshake' },
-  { id: 'mk2', title: 'ميلك شيك فراولة', titleEn: 'Strawberry Milkshake', price: 25, rating: 5, emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالفراولة', descriptionEn: 'Strawberry milkshake' },
-  { id: 'mk3', title: 'ميلك شيك بستاشيو', titleEn: 'Pistachio Milkshake', price: 25, rating: 5, badge: 'جديد', emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالفستق', descriptionEn: 'Pistachio milkshake' },
-  { id: 'mk4', title: 'ميلك شيك لوتس', titleEn: 'Lotus Milkshake', price: 25, rating: 5, emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك باللوتس', descriptionEn: 'Lotus milkshake' },
-  { id: 'mk5', title: 'ميلك شيك كندر', titleEn: 'Kinder Milkshake', price: 25, rating: 5, emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالكندر', descriptionEn: 'Kinder milkshake' },
-  { id: 'mk6', title: 'ميلك شيك فانيليا', titleEn: 'Vanilla Milkshake', price: 25, rating: 4.5, emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالفانيليا', descriptionEn: 'Vanilla milkshake' },
-  { id: 'mk7', title: 'ميلك شيك كاراميل', titleEn: 'Caramel Milkshake', price: 25, rating: 4.5, emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالكراميل', descriptionEn: 'Caramel milkshake' },
-  { id: 'mk8', title: 'ميلك شيك أوريو', titleEn: 'Oreo Milkshake', price: 25, rating: 5, badge: 'الأكثر طلبًا', emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالأوريو', descriptionEn: 'Oreo milkshake' },
-  { id: 'sfm1', title: 'موهيتو خوخ خالي من السكر', titleEn: 'Sugar-Free Peach Mojito', price: 16, rating: 5, badge: 'خالٍ من السكر', emoji: '🍹', categoryId: 'mojito', description: 'موهيتو خوخ خالٍ من السكر', descriptionEn: 'Sugar-free peach mojito', optionGroups: sugarFreeMojitoOptionGroups },
-  { id: 'sfm2', title: 'موهيتو فراولة خالي من السكر', titleEn: 'Sugar-Free Strawberry Mojito', price: 16, rating: 5, badge: 'خالٍ من السكر', emoji: '🍹', categoryId: 'mojito', description: 'موهيتو فراولة خالٍ من السكر', descriptionEn: 'Sugar-free strawberry mojito', optionGroups: sugarFreeMojitoOptionGroups },
-  { id: 'sand1', title: 'ساندويتش تونة', titleEn: 'Tuna Sandwich', price: 10, rating: 5, emoji: '🥪', categoryId: 'sandwiches', description: 'تونة مع جرجير، هريسة، زيتون، ذرة، دجاج، جبنة', descriptionEn: 'Tuna with arugula, harissa, olives, corn, chicken and cheese', optionGroups: sandwichBreadOptions },
-  { id: 'sand2', title: 'ساندويتش رومي مدخن', titleEn: 'Smoked Turkey Sandwich', price: 15, rating: 5, emoji: '🥪', categoryId: 'sandwiches', description: 'رومي مدخن مع جبنة إيمينتال وجبنة مالدينا', descriptionEn: 'Smoked turkey with Emmental and Maldina cheese', optionGroups: sandwichBreadOptions },
-  { id: 'bag1', title: 'بيغل تونا بيستو', titleEn: 'Tuna Pesto Bagel', price: 17, rating: 5, badge: 'الأكثر طلبًا', emoji: '🥯', categoryId: 'bagels', description: 'بيغل بالتونة والبيستو', descriptionEn: 'Tuna pesto bagel' },
-  { id: 'bag2', title: 'بيغل تركي مدخن', titleEn: 'Smoked Turkey Bagel', price: 18, rating: 5, emoji: '🥯', categoryId: 'bagels', description: 'بيغل بالتركي المدخن', descriptionEn: 'Smoked turkey bagel' },
-  { id: 'bag3', title: 'بيغل سلامي مدخن', titleEn: 'Smoked Salami Bagel', price: 18, rating: 4.5, emoji: '🥯', categoryId: 'bagels', description: 'بيغل بالسلامي المدخن', descriptionEn: 'Smoked salami bagel' },
-  { id: 'kro1', title: 'كروفِل نوتيلا', titleEn: 'Nutella Kroffle', price: 15, rating: 5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل بالنوتيلا', descriptionEn: 'Nutella kroffle' },
-  { id: 'kro2', title: 'كروفِل بستاشيو', titleEn: 'Pistachio Kroffle', price: 15, rating: 5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل بالفستق', descriptionEn: 'Pistachio kroffle' },
-  { id: 'kro3', title: 'كروفِل ميكس نوتيلا وبستاشيو', titleEn: 'Mix Nutella and Pistachio Kroffle', price: 16, rating: 5, badge: 'جديد', emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل بالنوتيلا والفستق', descriptionEn: 'Nutella and pistachio kroffle' },
-  { id: 'kro4', title: 'كروفِل لوتس', titleEn: 'Lotus Kroffle', price: 15, rating: 5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل باللوتس', descriptionEn: 'Lotus kroffle' },
-  { id: 'kro5', title: 'كروفِل كندر بوينو', titleEn: 'Kinder Bueno Kroffle', price: 16, rating: 5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل بالكندر بوينو', descriptionEn: 'Kinder Bueno kroffle' },
-  { id: 'kro6', title: 'كروفِل زبدة فول سوداني بالعسل', titleEn: 'Peanut Butter and Honey Kroffle', price: 14, rating: 4.5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل بزبدة الفول السوداني والعسل', descriptionEn: 'Peanut butter and honey kroffle' },
-  { id: 'kro7', title: 'كروفِل تركي مدخن بالجبنة', titleEn: 'Smoked Turkey Savory Kroffle', price: 16, rating: 5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل مالح بالتركي المدخن والجبنة', descriptionEn: 'Savory kroffle with smoked turkey and cheese' },
-  { id: 'kro8', title: 'كروفِل فيلادلفيا بالعسل', titleEn: 'Philadelphia Cheese and Honey Kroffle', price: 16, rating: 4.5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل مالح بجبنة فيلادلفيا والعسل', descriptionEn: 'Savory kroffle with Philadelphia cheese and honey' },
-  { id: 'tea1', title: 'شاي مثلج توت', titleEn: 'Raspberry Iced Tea', price: 15, rating: 5, emoji: '🫖', categoryId: 'icedtea', description: 'شاي مثلج بنكهة التوت', descriptionEn: 'Raspberry iced tea' },
-  { id: 'tea2', title: 'شاي مثلج خوخ', titleEn: 'Peach Iced Tea', price: 15, rating: 5, emoji: '🫖', categoryId: 'icedtea', description: 'شاي مثلج بنكهة الخوخ', descriptionEn: 'Peach iced tea' },
-  { id: 'tea3', title: 'شاي مثلج ليمون', titleEn: 'Lemon Iced Tea', price: 15, rating: 4.5, emoji: '🫖', categoryId: 'icedtea', description: 'شاي مثلج بالليمون', descriptionEn: 'Lemon iced tea' },
-  { id: 'ma1', title: 'ماتشا مانجو', titleEn: 'Mango Matcha', price: 26, rating: 5, badge: 'جديد', emoji: '🍵', categoryId: 'matcha', description: 'ماتشا بالمانجو', descriptionEn: 'Mango matcha' },
-  { id: 'ma2', title: 'ماتشا فراولة', titleEn: 'Strawberry Matcha', price: 26, rating: 5, badge: 'جديد', emoji: '🍵', categoryId: 'matcha', description: 'ماتشا بالفراولة', descriptionEn: 'Strawberry matcha' },
-  { id: 'ma3', title: 'ماتشا كلاسيك بالعسل', titleEn: 'Classic Honey Matcha', price: 25, rating: 5, emoji: '🍵', categoryId: 'matcha', description: 'ماتشا كلاسيك بالعسل', descriptionEn: 'Classic honey matcha' },
+  // Hot Drinks
+  { id: 'h1', title: 'سبانش لاتيه', titleEn: 'Spanish Latte', price: 12, rating: 5, badge: 'الأكثر طلبًا', emoji: '☕', categoryId: 'hot', description: 'لاتيه إسباني غني بنكهة الحليب المكثف', descriptionEn: 'Rich Spanish latte with condensed milk', imageUrl: 'https://images.pexels.com/photos/6747870/pexels-photo-6747870.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'h2', title: 'كرست سالتد كاراميل', titleEn: 'Krust Salted Caramel', price: 14, rating: 5, badge: 'جديد', emoji: '☕', categoryId: 'hot', description: 'لاتيه بالكراميل المملح', descriptionEn: 'Salted caramel latte', imageUrl: 'https://images.pexels.com/photos/459489/pexels-photo-459489.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'h3', title: 'بستاشيو لاتيه', titleEn: 'Pistachio Latte', price: 14, rating: 5, badge: 'الأكثر طلبًا', emoji: '☕', categoryId: 'hot', description: 'لاتيه بالفستق الحلبي', descriptionEn: 'Pistachio latte', imageUrl: 'https://images.pexels.com/photos/7683595/pexels-photo-7683595.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'h4', title: 'سينابون لاتيه', titleEn: 'Cinnabon Latte', price: 12, rating: 4.5, emoji: '☕', categoryId: 'hot', description: 'لاتيه بنكهة القرفة', descriptionEn: 'Cinnamon latte', imageUrl: 'https://images.pexels.com/photos/6747870/pexels-photo-6747870.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'h5', title: 'وايت شوكولات لاتيه', titleEn: 'White Chocolate Latte', price: 14, rating: 5, emoji: '☕', categoryId: 'hot', description: 'لاتيه بالشوكولاتة البيضاء', descriptionEn: 'White chocolate latte', imageUrl: 'https://images.pexels.com/photos/459489/pexels-photo-459489.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'h6', title: 'فانيليا لاتيه', titleEn: 'Vanilla Latte', price: 10, rating: 4.5, emoji: '☕', categoryId: 'hot', description: 'لاتيه بالفانيليا', descriptionEn: 'Vanilla latte', imageUrl: 'https://images.pexels.com/photos/7683595/pexels-photo-7683595.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'h7', title: 'لاتيه بندق', titleEn: 'Hazelnut Latte', price: 10, rating: 4.5, emoji: '☕', categoryId: 'hot', description: 'لاتيه بالبندق', descriptionEn: 'Hazelnut latte', imageUrl: 'https://images.pexels.com/photos/6747870/pexels-photo-6747870.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'h8', title: 'جنجر بريد لاتيه', titleEn: 'Gingerbread Latte', price: 14, rating: 5, badge: 'جديد', emoji: '☕', categoryId: 'hot', description: 'لاتيه بجنجر الخبز', descriptionEn: 'Gingerbread latte', imageUrl: 'https://images.pexels.com/photos/459489/pexels-photo-459489.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+
+  // Cold Drinks
+  { id: 'c1', title: 'إيس سبانش لاتيه', titleEn: 'Ice Spanish Latte', price: 17, rating: 5, badge: 'الأكثر طلبًا', emoji: '🧊', categoryId: 'cold', description: 'لاتيه إسباني بارد', descriptionEn: 'Iced Spanish latte', imageUrl: 'https://images.pexels.com/photos/38028988/pexels-photo-38028988.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'c2', title: 'إيس سالتد كاراميل', titleEn: 'Ice Salted Caramel Latte', price: 20, rating: 5, badge: 'الأكثر طلبًا', emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالكراميل المملح', descriptionEn: 'Iced salted caramel latte', imageUrl: 'https://images.pexels.com/photos/38028984/pexels-photo-38028984.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'c3', title: 'إيس وايت شوكولات راسبيري', titleEn: 'Ice White Chocolate Raspberry', price: 22, rating: 5, badge: 'جديد', emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالشوكولاتة البيضاء والتوت', descriptionEn: 'Iced white chocolate raspberry', imageUrl: 'https://images.pexels.com/photos/38028987/pexels-photo-38028987.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'c4', title: 'إيس بستاشيو لاتيه', titleEn: 'Ice Pistachio Latte', price: 17, rating: 5, emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالفستق', descriptionEn: 'Iced pistachio latte', imageUrl: 'https://images.pexels.com/photos/38028988/pexels-photo-38028988.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'c5', title: 'إيس سينابون لاتيه', titleEn: 'Ice Cinnabon Latte', price: 17, rating: 4.5, emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالقرفة', descriptionEn: 'Iced Cinnabon latte', imageUrl: 'https://images.pexels.com/photos/38028984/pexels-photo-38028984.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'c6', title: 'إيس وايت شوكولات لاتيه', titleEn: 'Ice White Chocolate Latte', price: 18, rating: 5, emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالشوكولاتة البيضاء', descriptionEn: 'Iced white chocolate latte', imageUrl: 'https://images.pexels.com/photos/38028987/pexels-photo-38028987.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'c7', title: 'إيس فانيليا لاتيه', titleEn: 'Ice Vanilla Latte', price: 15, rating: 4.5, emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالفانيليا', descriptionEn: 'Iced vanilla latte', imageUrl: 'https://images.pexels.com/photos/38028988/pexels-photo-38028988.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'c8', title: 'إيس لاتيه بندق', titleEn: 'Ice Hazelnut Latte', price: 15, rating: 4.5, emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالبندق', descriptionEn: 'Iced hazelnut latte', imageUrl: 'https://images.pexels.com/photos/38028984/pexels-photo-38028984.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'c9', title: 'إيس جنجر لاتيه', titleEn: 'Ice Ginger Latte', price: 17, rating: 5, badge: 'جديد', emoji: '🧊', categoryId: 'cold', description: 'لاتيه بارد بالجنجر', descriptionEn: 'Iced ginger latte', imageUrl: 'https://images.pexels.com/photos/38028987/pexels-photo-38028987.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'c10', title: 'إيس أمريكانو', titleEn: 'Ice Americano', price: 10, rating: 4.5, emoji: '🧊', categoryId: 'cold', description: 'أمريكانو بارد', descriptionEn: 'Iced Americano', imageUrl: 'https://images.pexels.com/photos/38028988/pexels-photo-38028988.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'c11', title: 'إيس فلتر كوفي', titleEn: 'Ice Filter Coffee', price: 6, rating: 4, emoji: '🧊', categoryId: 'cold', description: 'قهوة فلتر باردة', descriptionEn: 'Iced filter coffee', imageUrl: 'https://images.pexels.com/photos/38028984/pexels-photo-38028984.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+
+  // Sugar-Free Lattes
+  { id: 'sf1', title: 'لاتيه بندق', titleEn: 'Hazelnut Latte', price: 10, rating: 5, badge: 'خالٍ من السكر', emoji: '🥛', categoryId: 'sugarfree', description: 'لاتيه بالبندق خالٍ من السكر', descriptionEn: 'Sugar-free hazelnut latte', optionGroups: sugarFreeOptionGroups, imageUrl: 'https://images.pexels.com/photos/6747870/pexels-photo-6747870.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'sf2', title: 'لاتيه كراميل', titleEn: 'Caramel Latte', price: 10, rating: 5, badge: 'خالٍ من السكر', emoji: '🥛', categoryId: 'sugarfree', description: 'لاتيه بالكراميل خالٍ من السكر', descriptionEn: 'Sugar-free caramel latte', optionGroups: sugarFreeOptionGroups, imageUrl: 'https://images.pexels.com/photos/459489/pexels-photo-459489.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'sf3', title: 'لاتيه فانيليا', titleEn: 'Vanilla Latte', price: 10, rating: 4.5, badge: 'خالٍ من السكر', emoji: '🥛', categoryId: 'sugarfree', description: 'لاتيه بالفانيليا خالٍ من السكر', descriptionEn: 'Sugar-free vanilla latte', optionGroups: sugarFreeOptionGroups, imageUrl: 'https://images.pexels.com/photos/7683595/pexels-photo-7683595.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+
+  // Mojitos
+  { id: 'm1', title: 'موهيتو', titleEn: 'Mojito', price: 16, rating: 5, badge: 'الأكثر طلبًا', emoji: '🍹', categoryId: 'mojito', description: 'موهيتو منعش باختيار الأساس والنكهة', descriptionEn: 'Refreshing mojito — choose base & flavor', optionGroups: mojitoOptionGroups, imageUrl: 'https://images.pexels.com/photos/37662775/pexels-photo-37662775.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+
+  // Milkshakes
+  { id: 'mk1', title: 'ميلك شيك نوتيلا', titleEn: 'Nutella Milkshake', price: 25, rating: 5, badge: 'الأكثر طلبًا', emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالنوتيلا', descriptionEn: 'Nutella milkshake', imageUrl: 'https://images.pexels.com/photos/7656388/pexels-photo-7656388.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'mk2', title: 'ميلك شيك فراولة', titleEn: 'Strawberry Milkshake', price: 25, rating: 5, emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالفراولة', descriptionEn: 'Strawberry milkshake', imageUrl: 'https://images.pexels.com/photos/17612822/pexels-photo-17612822.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'mk3', title: 'ميلك شيك بستاشيو', titleEn: 'Pistachio Milkshake', price: 25, rating: 5, badge: 'جديد', emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالفستق', descriptionEn: 'Pistachio milkshake', imageUrl: 'https://images.pexels.com/photos/7656388/pexels-photo-7656388.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'mk4', title: 'ميلك شيك لوتس', titleEn: 'Lotus Milkshake', price: 25, rating: 5, emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك باللوتس', descriptionEn: 'Lotus milkshake', imageUrl: 'https://images.pexels.com/photos/17612822/pexels-photo-17612822.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'mk5', title: 'ميلك شيك كندر', titleEn: 'Kinder Milkshake', price: 25, rating: 5, emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالكندر', descriptionEn: 'Kinder milkshake', imageUrl: 'https://images.pexels.com/photos/7656388/pexels-photo-7656388.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'mk6', title: 'ميلك شيك فانيليا', titleEn: 'Vanilla Milkshake', price: 25, rating: 4.5, emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالفانيليا', descriptionEn: 'Vanilla milkshake', imageUrl: 'https://images.pexels.com/photos/17612822/pexels-photo-17612822.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'mk7', title: 'ميلك شيك كاراميل', titleEn: 'Caramel Milkshake', price: 25, rating: 4.5, emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالكراميل', descriptionEn: 'Caramel milkshake', imageUrl: 'https://images.pexels.com/photos/7656388/pexels-photo-7656388.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'mk8', title: 'ميلك شيك أوريو', titleEn: 'Oreo Milkshake', price: 25, rating: 5, badge: 'الأكثر طلبًا', emoji: '🥤', categoryId: 'milkshake', description: 'ميلك شيك بالأوريو', descriptionEn: 'Oreo milkshake', imageUrl: 'https://images.pexels.com/photos/17612822/pexels-photo-17612822.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+
+  // Sugar-Free Mojitos
+  { id: 'sfm1', title: 'موهيتو خوخ خالي من السكر', titleEn: 'Sugar-Free Peach Mojito', price: 16, rating: 5, badge: 'خالٍ من السكر', emoji: '🍹', categoryId: 'mojito', description: 'موهيتو خوخ خالٍ من السكر', descriptionEn: 'Sugar-free peach mojito', optionGroups: sugarFreeMojitoOptionGroups, imageUrl: 'https://images.pexels.com/photos/10839495/pexels-photo-10839495.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'sfm2', title: 'موهيتو فراولة خالي من السكر', titleEn: 'Sugar-Free Strawberry Mojito', price: 16, rating: 5, badge: 'خالٍ من السكر', emoji: '🍹', categoryId: 'mojito', description: 'موهيتو فراولة خالٍ من السكر', descriptionEn: 'Sugar-free strawberry mojito', optionGroups: sugarFreeMojitoOptionGroups, imageUrl: 'https://images.pexels.com/photos/9584965/pexels-photo-9584965.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+
+  // Sandwiches
+  { id: 'sand1', title: 'ساندويتش تونة', titleEn: 'Tuna Sandwich', price: 10, rating: 5, emoji: '🥪', categoryId: 'sandwiches', description: 'تونة مع جرجير، هريسة، زيتون، ذرة، دجاج، جبنة', descriptionEn: 'Tuna with arugula, harissa, olives, corn, chicken and cheese', optionGroups: sandwichBreadOptions, imageUrl: 'https://images.pexels.com/photos/2955819/pexels-photo-2955819.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'sand2', title: 'ساندويتش رومي مدخن', titleEn: 'Smoked Turkey Sandwich', price: 15, rating: 5, emoji: '🥪', categoryId: 'sandwiches', description: 'رومي مدخن مع جبنة إيمينتال وجبنة مالدينا', descriptionEn: 'Smoked turkey with Emmental and Maldina cheese', optionGroups: sandwichBreadOptions, imageUrl: 'https://images.pexels.com/photos/5713744/pexels-photo-5713744.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+
+  // Bagels
+  { id: 'bag1', title: 'بيغل تونا بيستو', titleEn: 'Tuna Pesto Bagel', price: 17, rating: 5, badge: 'الأكثر طلبًا', emoji: '🥯', categoryId: 'bagels', description: 'بيغل بالتونة والبيستو', descriptionEn: 'Tuna pesto bagel', imageUrl: 'https://images.pexels.com/photos/12176273/pexels-photo-12176273.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'bag2', title: 'بيغل تركي مدخن', titleEn: 'Smoked Turkey Bagel', price: 18, rating: 5, emoji: '🥯', categoryId: 'bagels', description: 'بيغل بالتركي المدخن', descriptionEn: 'Smoked turkey bagel', imageUrl: 'https://images.pexels.com/photos/12176271/pexels-photo-12176271.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'bag3', title: 'بيغل سلامي مدخن', titleEn: 'Smoked Salami Bagel', price: 18, rating: 4.5, emoji: '🥯', categoryId: 'bagels', description: 'بيغل بالسلامي المدخن', descriptionEn: 'Smoked salami bagel', imageUrl: 'https://images.pexels.com/photos/3892468/pexels-photo-3892468.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+
+  // Kroffles
+  { id: 'kro1', title: 'كروفِل نوتيلا', titleEn: 'Nutella Kroffle', price: 15, rating: 5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل بالنوتيلا', descriptionEn: 'Nutella kroffle', imageUrl: 'https://images.pexels.com/photos/10249461/pexels-photo-10249461.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'kro2', title: 'كروفِل بستاشيو', titleEn: 'Pistachio Kroffle', price: 15, rating: 5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل بالفستق', descriptionEn: 'Pistachio kroffle', imageUrl: 'https://images.pexels.com/photos/28402363/pexels-photo-28402363.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'kro3', title: 'كروفِل ميكس نوتيلا وبستاشيو', titleEn: 'Mix Nutella and Pistachio Kroffle', price: 16, rating: 5, badge: 'جديد', emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل بالنوتيلا والفستق', descriptionEn: 'Nutella and pistachio kroffle', imageUrl: 'https://images.pexels.com/photos/39240989/pexels-photo-39240989.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'kro4', title: 'كروفِل لوتس', titleEn: 'Lotus Kroffle', price: 15, rating: 5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل باللوتس', descriptionEn: 'Lotus kroffle', imageUrl: 'https://images.pexels.com/photos/10249461/pexels-photo-10249461.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'kro5', title: 'كروفِل كندر بوينو', titleEn: 'Kinder Bueno Kroffle', price: 16, rating: 5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل بالكندر بوينو', descriptionEn: 'Kinder Bueno kroffle', imageUrl: 'https://images.pexels.com/photos/28402363/pexels-photo-28402363.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'kro6', title: 'كروفِل زبدة فول سوداني بالعسل', titleEn: 'Peanut Butter and Honey Kroffle', price: 14, rating: 4.5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل بزبدة الفول السوداني والعسل', descriptionEn: 'Peanut butter and honey kroffle', imageUrl: 'https://images.pexels.com/photos/39240989/pexels-photo-39240989.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'kro7', title: 'كروفِل تركي مدخن بالجبنة', titleEn: 'Smoked Turkey Savory Kroffle', price: 16, rating: 5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل مالح بالتركي المدخن والجبنة', descriptionEn: 'Savory kroffle with smoked turkey and cheese', imageUrl: 'https://images.pexels.com/photos/10249461/pexels-photo-10249461.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'kro8', title: 'كروفِل فيلادلفيا بالعسل', titleEn: 'Philadelphia Cheese and Honey Kroffle', price: 16, rating: 4.5, emoji: '🧇', categoryId: 'kroffles', description: 'كروفِل مالح بجبنة فيلادلفيا والعسل', descriptionEn: 'Savory kroffle with Philadelphia cheese and honey', imageUrl: 'https://images.pexels.com/photos/28402363/pexels-photo-28402363.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+
+  // Iced Tea
+  { id: 'tea1', title: 'شاي مثلج توت', titleEn: 'Raspberry Iced Tea', price: 15, rating: 5, emoji: '🫖', categoryId: 'icedtea', description: 'شاي مثلج بنكهة التوت', descriptionEn: 'Raspberry iced tea', imageUrl: 'https://images.pexels.com/photos/8215110/pexels-photo-8215110.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'tea2', title: 'شاي مثلج خوخ', titleEn: 'Peach Iced Tea', price: 15, rating: 5, emoji: '🫖', categoryId: 'icedtea', description: 'شاي مثلج بنكهة الخوخ', descriptionEn: 'Peach iced tea', imageUrl: 'https://images.pexels.com/photos/8215110/pexels-photo-8215110.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'tea3', title: 'شاي مثلج ليمون', titleEn: 'Lemon Iced Tea', price: 15, rating: 4.5, emoji: '🫖', categoryId: 'icedtea', description: 'شاي مثلج بالليمون', descriptionEn: 'Lemon iced tea', imageUrl: 'https://images.pexels.com/photos/8215110/pexels-photo-8215110.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+
+  // Matcha
+  { id: 'ma1', title: 'ماتشا مانجو', titleEn: 'Mango Matcha', price: 26, rating: 5, badge: 'جديد', emoji: '🍵', categoryId: 'matcha', description: 'ماتشا بالمانجو', descriptionEn: 'Mango matcha', imageUrl: 'https://images.pexels.com/photos/8215110/pexels-photo-8215110.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'ma2', title: 'ماتشا فراولة', titleEn: 'Strawberry Matcha', price: 26, rating: 5, badge: 'جديد', emoji: '🍵', categoryId: 'matcha', description: 'ماتشا بالفراولة', descriptionEn: 'Strawberry matcha', imageUrl: 'https://images.pexels.com/photos/7656388/pexels-photo-7656388.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
+  { id: 'ma3', title: 'ماتشا كلاسيك بالعسل', titleEn: 'Classic Honey Matcha', price: 25, rating: 5, emoji: '🍵', categoryId: 'matcha', description: 'ماتشا كلاسيك بالعسل', descriptionEn: 'Classic honey matcha', imageUrl: 'https://images.pexels.com/photos/8215110/pexels-photo-8215110.jpeg?auto=compress&cs=tinysrgb&h=650&w=940' },
 ];
 
 export const featuredProducts: Product[] = [
