@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Modal, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Modal, ActivityIndicator, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronRight, Store, Bike, User, Phone, MapPin, Check } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -57,27 +57,55 @@ export default function CheckoutScreen() {
   async function useCurrentLocation() {
     try {
       setLoadingLocation(true);
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const servicesEnabled = await Location.hasServicesEnabledAsync();
+      if (!servicesEnabled) {
+        Alert.alert(
+          'خدمة الموقع مغلقة',
+          'يرجى تشغيل خدمة GPS من إعدادات الهاتف ثم المحاولة مرة أخرى'
+        );
+        return;
+      }
+      let { status } = await Location.getForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('الإذن مرفوض', 'يرجى السماح بالوصول إلى الموقع من الإعدادات');
+        const req = await Location.requestForegroundPermissionsAsync();
+        status = req.status;
+      }
+      if (status !== 'granted') {
+        Alert.alert(
+          'الإذن مرفوض',
+          'يحتاج التطبيق إلى إذن الموقع لتوصيل طلبك تلقائياً',
+          [
+            { text: 'إلغاء', style: 'cancel' },
+            { text: 'فتح الإعدادات', onPress: () => Linking.openSettings() },
+          ]
+        );
         return;
       }
       const pos = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
+        timeout: 15000,
       });
-      const results = await Location.reverseGeocodeAsync({
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-      });
-      if (results.length > 0) {
-        const r = results[0];
-        const city = r.city || r.subregion || r.region || 'بنغازي';
-        const street = r.street || r.name || '';
-        const district = r.district || '';
-        setAddress([city, district, street].filter(Boolean).join('، '));
+      let formatted = '';
+      try {
+        const results = await Location.reverseGeocodeAsync({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        });
+        if (results.length > 0) {
+          const r = results[0];
+          const city = r.city || r.subregion || r.region || 'بنغازي';
+          const street = r.street || r.name || '';
+          const district = r.district || '';
+          formatted = [city, district, street].filter(Boolean).join('، ');
+        }
+      } catch (geoErr) {
+        formatted = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
       }
-    } catch (e) {
-      Alert.alert('خطأ', 'تعذّر الحصول على الموقع');
+      if (formatted) {
+        setAddress(formatted);
+      }
+    } catch (e: any) {
+      Alert.alert('خطأ', 'تعذّر الحصول على الموقع. تأكد من تشغيل GPS والسماح بالإذن');
     } finally {
       setLoadingLocation(false);
     }
