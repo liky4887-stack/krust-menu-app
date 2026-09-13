@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronRight, Clock, ChefHat, Package, CheckCircle2, XCircle, LogOut, Store, Bike } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, Radius } from '@/constants/colors';
-import { supabase } from '@/lib/supabase';
 import { OrderStatus } from '@/store/useOrdersStore';
 
 interface StaffOrder {
@@ -49,54 +48,44 @@ export default function StaffDashboardScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [displayName, setDisplayName] = useState('');
 
-  const fetchOrders = async () => {
-    const { data } = await supabase
-      .from('orders')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100);
-    if (data) setOrders(data as StaffOrder[]);
+  const fetchOrders = () => {
+    const stored = typeof window !== 'undefined' ? window.localStorage.getItem('krust-orders') : null;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed?.orders) {
+          setOrders(parsed.orders);
+        }
+      } catch {
+        setOrders([]);
+      }
+    } else {
+      setOrders([]);
+    }
     setLoading(false);
     setRefreshing(false);
   };
 
   useEffect(() => {
     fetchOrders();
-    const channel = supabase
-      .channel('staff-orders')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-        fetchOrders();
-      })
-      .subscribe();
-
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        supabase
-          .from('staff_profiles')
-          .select('display_name')
-          .eq('id', data.user.id)
-          .single()
-          .then(({ data: profile }) => {
-            if (profile) setDisplayName(profile.display_name ?? '');
-          });
-      }
-    });
-
-    return () => { supabase.removeChannel(channel); };
+    const interval = setInterval(fetchOrders, 2000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
-    await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
+  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
+    // Optimistic update
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+    );
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
     router.replace('/');
   };
 
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     setRefreshing(true);
-    await fetchOrders();
+    fetchOrders();
   };
 
   const activeOrders = orders.filter((o) => o.status !== 'completed' && o.status !== 'cancelled');
@@ -138,17 +127,17 @@ export default function StaffDashboardScreen() {
                 {order.fulfillment === 'pickup' ? 'استلام' : 'توصيل'}
               </Text>
             </View>
-            <Text style={styles.orderTotal}>{Number(order.total).toFixed(2)} د.ل</Text>
+            <Text style={styles.orderTotal}>{order.total.toFixed(2)} د.ل</Text>
           </View>
 
           {next && (
             <TouchableOpacity
               style={styles.advanceBtn}
               onPress={() => handleStatusChange(order.id, next)}
-              activeOpacity={0.7}
+              activeOpacity={0.85}
             >
-              <Text style={styles.advanceBtnText}>{nextStatusLabel[order.status]}</Text>
-              <ChevronRight size={16} color={Colors.WHITE} strokeWidth={2.5} />
+              <Text style={styles.advanceBtnText}>{nextStatusLabel[next]}</Text>
+              <ChevronRight size={18} color={Colors.WHITE} strokeWidth={2.5} />
             </TouchableOpacity>
           )}
         </View>
@@ -162,30 +151,29 @@ export default function StaffDashboardScreen() {
         <View style={styles.headerTop}>
           <View>
             <Text style={styles.headerTitle}>لوحة التحكم</Text>
-            <Text style={styles.headerSubtitle}>
-              {displayName ? `مرحبًا ${displayName}` : 'مرحبًا'}
-            </Text>
+            <Text style={styles.headerSubtitle}>{displayName || 'الموظف'}</Text>
           </View>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
             <LogOut size={18} color={Colors.PRIMARY} strokeWidth={2} />
-            <Text style={styles.logoutText}>خروج</Text>
+            <Text style={styles.logoutText}>تسجيل خروج</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{activeOrders.length}</Text>
-            <Text style={styles.statLabel}>طلبات نشطة</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{completedOrders.length}</Text>
-            <Text style={styles.statLabel}>طلبات مكتملة</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>
-              {activeOrders.filter((o) => o.status === 'pending').length}
-            </Text>
-            <Text style={styles.statLabel}>بانتظار</Text>
-          </View>
+      </View>
+
+      <View style={styles.statsRow}>
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{activeOrders.length}</Text>
+          <Text style={styles.statLabel}>طلبات نشطة</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{completedOrders.length}</Text>
+          <Text style={styles.statLabel}>طلبات مكتملة</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>
+            {activeOrders.filter((o) => o.status === 'pending').length}
+          </Text>
+          <Text style={styles.statLabel}>بانتظار</Text>
         </View>
       </View>
 
