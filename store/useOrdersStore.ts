@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { persistentStorage } from '@/lib/storage';
 import { CartItem } from '@/store/useCartStore';
-import { supabase } from '@/lib/supabase';
 
 export type FulfillmentType = 'pickup' | 'delivery';
 export type PaymentMethod = 'sedad' | 'edfaely' | 'cash';
@@ -27,9 +26,8 @@ export interface Order {
 
 interface OrdersState {
   orders: Order[];
-  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>) => Promise<Order>;
+  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>) => Order;
   updateOrderStatus: (id: string, status: OrderStatus) => void;
-  syncFromSupabase: () => Promise<void>;
   clearOrders: () => void;
 }
 
@@ -38,32 +36,11 @@ export const useOrdersStore = create<OrdersState>()(
     (set, get) => ({
       orders: [],
 
-      addOrder: async (orderData) => {
-        const { data, error } = await supabase
-          .from('orders')
-          .insert({
-            customer_name: orderData.customerName,
-            customer_phone: orderData.customerPhone,
-            customer_address: orderData.customerAddress || null,
-            fulfillment: orderData.fulfillment,
-            payment_method: orderData.paymentMethod,
-            payment_ref: orderData.paymentRef,
-            subtotal: orderData.subtotal,
-            tax: orderData.tax,
-            delivery_fee: orderData.deliveryFee,
-            total: orderData.total,
-            items_json: JSON.stringify(orderData.items),
-            status: 'pending',
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-
+      addOrder: (orderData) => {
         const order: Order = {
           ...orderData,
-          id: data.id,
-          createdAt: data.created_at,
+          id: `ORD-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          createdAt: new Date().toISOString(),
           status: 'pending',
         };
         set((state) => ({ orders: [order, ...state.orders] }));
@@ -76,34 +53,6 @@ export const useOrdersStore = create<OrdersState>()(
             o.id === id ? { ...o, status } : o
           ),
         })),
-
-      syncFromSupabase: async () => {
-        const { data, error } = await supabase
-          .from('orders')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(50);
-
-        if (error || !data) return;
-
-        const orders: Order[] = data.map((row: any) => ({
-          id: row.id,
-          items: typeof row.items_json === 'string' ? JSON.parse(row.items_json) : row.items_json,
-          subtotal: Number(row.subtotal),
-          tax: Number(row.tax),
-          deliveryFee: Number(row.delivery_fee),
-          total: Number(row.total),
-          customerName: row.customer_name,
-          customerPhone: row.customer_phone,
-          customerAddress: row.customer_address || '',
-          fulfillment: row.fulfillment,
-          paymentMethod: row.payment_method,
-          paymentRef: row.payment_ref || '',
-          status: row.status,
-          createdAt: row.created_at,
-        }));
-        set({ orders });
-      },
 
       clearOrders: () => set({ orders: [] }),
     }),

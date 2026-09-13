@@ -60,14 +60,10 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Pressable
-          style={styles.logoContainer}
-          onLongPress={() => router.push('/staff-login')}
-          delayLongPress={1500}
-        >
+        <View style={styles.logoContainer}>
           <Text style={styles.logoTitle}>Krust</Text>
           <Text style={styles.logoSubtitle}>2026</Text>
-        </Pressable>
+        </View>
       </View>
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
