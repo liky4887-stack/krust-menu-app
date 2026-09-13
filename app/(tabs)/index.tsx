@@ -105,8 +105,9 @@ export default function HomeScreen() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              pagingEnabled
-              snapToInterval={SLIDE_WIDTH + 12}
+              pagingEnabled={false}
+              snapToInterval={SLIDE_WIDTH}
+              snapToAlignment="start"
               decelerationRate="fast"
               onScroll={(e) => {
                 const idx = Math.round(e.nativeEvent.contentOffset.x / SLIDE_WIDTH);
@@ -114,6 +115,7 @@ export default function HomeScreen() {
               }}
               scrollEventThrottle={16}
               contentContainerStyle={{ paddingHorizontal: 16 }}
+              style={{ marginHorizontal: 0 }}
             >
               {banners.map((banner, i) => (
                 <View key={i} style={[styles.bannerCard, { width: SLIDE_WIDTH }]}>

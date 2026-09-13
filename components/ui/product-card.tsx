@@ -104,11 +104,7 @@ export default function ProductCard({
           <Text style={styles.imageText} numberOfLines={2}>{image}</Text>
         )}
         {rating !== undefined ? <RatingBadge value={rating} /> : null}
-        {badge ? (
-          <View style={[styles.badge, { backgroundColor: badgeColor }]}>
-            <Text style={styles.badgeText}>{badge}</Text>
-          </View>
-        ) : null}
+
         {discount ? (
           <View style={styles.discountPill}>
             <Text style={styles.discountText}>-{discount}%</Text>
@@ -135,6 +131,11 @@ export default function ProductCard({
       >
         <Text numberOfLines={1} style={styles.title}>{title}</Text>
         {titleEn ? <Text style={styles.titleEn} numberOfLines={1}>{titleEn}</Text> : null}
+        {badge ? (
+          <View style={[styles.badge, { backgroundColor: badgeColor }]}>
+            <Text style={styles.badgeText}>{badge}</Text>
+          </View>
+        ) : null}
         <View style={styles.bottomRow}>
           <View style={styles.priceContainer}>
             <Text style={styles.price}>{currency}{price.toFixed(2)}</Text>
@@ -206,16 +207,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   badge: {
-    position: 'absolute',
-    right: 10,
-    top: 10,
+    alignSelf: 'flex-start',
     borderRadius: 6,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    backgroundColor: '#1E40AF',
+    marginBottom: 4,
   },
   badgeText: {
     color: Colors.WHITE,
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '700',
   },
   discountPill: {
