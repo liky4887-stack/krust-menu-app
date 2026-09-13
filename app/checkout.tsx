@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Modal, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronRight, Store, Bike, User, Phone, MapPin, Check } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import * as Location from 'expo-location';
+import MapView, { Marker, Region } from 'react-native-maps';
 import { Colors, Spacing, Radius } from '@/constants/colors';
 import { useCartStore } from '@/store/useCartStore';
 import { useCustomerStore, CustomerProfile } from '@/store/useCustomerStore';
@@ -21,6 +24,14 @@ export default function CheckoutScreen() {
   const [fulfillment, setFulfillment] = useState<FulfillmentType>('pickup');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [mapVisible, setMapVisible] = useState(false);
+  const [pickedRegion, setPickedRegion] = useState<Region>({
+    latitude: 32.1194,
+    longitude: 20.0868,
+    latitudeDelta: 0.15,
+    longitudeDelta: 0.15,
+  });
+  const [loadingLocation, setLoadingLocation] = useState(false);
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deliveryFee = fulfillment === 'delivery' ? 1.50 : 0;
@@ -42,6 +53,49 @@ export default function CheckoutScreen() {
     setErrors(e);
     return Object.keys(e).length === 0;
   };
+
+  async function useCurrentLocation() {
+    try {
+      setLoadingLocation(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('الإذن مرفوض', 'يرجى السماح بالوصول إلى الموقع من الإعدادات');
+        return;
+      }
+      const pos = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      const results = await Location.reverseGeocodeAsync({
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+      });
+      if (results.length > 0) {
+        const r = results[0];
+        const city = r.city || r.subregion || r.region || 'بنغازي';
+        const street = r.street || r.name || '';
+        const district = r.district || '';
+        setAddress([city, district, street].filter(Boolean).join('، '));
+      }
+    } catch (e) {
+      Alert.alert('خطأ', 'تعذّر الحصول على الموقع');
+    } finally {
+      setLoadingLocation(false);
+    }
+  }
+
+  async function reverseGeocodePin(region: Region) {
+    const results = await Location.reverseGeocodeAsync({
+      latitude: region.latitude,
+      longitude: region.longitude,
+    });
+    if (results.length > 0) {
+      const r = results[0];
+      const city = r.city || r.subregion || r.region || 'بنغازي';
+      const street = r.street || r.name || '';
+      const district = r.district || '';
+      setAddress([city, district, street].filter(Boolean).join('، '));
+    }
+  }
 
   const handleProceed = () => {
     setSubmitted(true);
@@ -177,21 +231,34 @@ export default function CheckoutScreen() {
 
             {fulfillment === 'delivery' && (
               <>
-                <View style={styles.inputGroup}>
-                  <View style={styles.inputIcon}>
-                    <MapPin size={18} color={Colors.DARK_GRAY} strokeWidth={2} />
-                  </View>
+                <View style={styles.addressRow}>
                   <TextInput
-                    style={[styles.input, styles.inputMultiline]}
-                    placeholder="عنوان التوصيل"
+                    style={styles.input}
+                    placeholder="مثال: بنغازي، شارع دبي، مبنى 12"
                     placeholderTextColor={Colors.DARK_GRAY}
                     value={address}
                     onChangeText={(v) => { setAddress(v); if (submitted) validate(); }}
                     textAlign="right"
-                    multiline
-                    textContentType="fullStreetAddress"
                   />
+                  <TouchableOpacity
+                    onPress={useCurrentLocation}
+                    disabled={loadingLocation}
+                    style={styles.locationBtn}
+                  >
+                    {loadingLocation ? (
+                      <ActivityIndicator size="small" color={Colors.PRIMARY} />
+                    ) : (
+                      <Ionicons name="navigate" size={20} color={Colors.PRIMARY} />
+                    )}
+                  </TouchableOpacity>
                 </View>
+                <TouchableOpacity
+                  style={styles.pickOnMapBtn}
+                  onPress={() => setMapVisible(true)}
+                >
+                  <Ionicons name="map-outline" size={18} color={Colors.PRIMARY} />
+                  <Text style={styles.pickOnMapText}>اختر موقعك من الخريطة</Text>
+                </TouchableOpacity>
                 {submitted && errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
               </>
             )}
@@ -239,6 +306,41 @@ export default function CheckoutScreen() {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+
+      {/* Map picker modal */}
+      <Modal
+        visible={mapVisible}
+        animationType="slide"
+        onRequestClose={() => setMapVisible(false)}
+      >
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+          <View style={styles.mapHeader}>
+            <TouchableOpacity onPress={() => setMapVisible(false)}>
+              <Ionicons name="close" size={24} color="#000" />
+            </TouchableOpacity>
+            <Text style={styles.mapTitle}>اختر موقع التوصيل</Text>
+            <View style={{ width: 24 }} />
+          </View>
+          <MapView
+            style={{ flex: 1 }}
+            initialRegion={pickedRegion}
+            onRegionChangeComplete={(r) => setPickedRegion(r)}
+          >
+            <Marker coordinate={pickedRegion} pinColor="#1E3A8A" />
+          </MapView>
+          <View style={styles.mapFooter}>
+            <TouchableOpacity
+              style={styles.confirmBtn}
+              onPress={async () => {
+                await reverseGeocodePin(pickedRegion);
+                setMapVisible(false);
+              }}
+            >
+              <Text style={styles.confirmBtnText}>تأكيد الموقع</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -296,7 +398,26 @@ const styles = StyleSheet.create({
   },
   inputIcon: { width: 24, alignItems: 'center' },
   input: { flex: 1, paddingVertical: Spacing.MD + 2, fontSize: 15, color: Colors.BLACK, textAlign: 'right' },
-  inputMultiline: { minHeight: 56, textAlignVertical: 'top' },
+  addressRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  locationBtn: { padding: 10, borderRadius: 10, backgroundColor: '#EFF6FF' },
+  pickOnMapBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 8, paddingVertical: 12, marginTop: 8,
+    borderWidth: 1, borderColor: Colors.PRIMARY, borderRadius: 12,
+  },
+  pickOnMapText: { color: Colors.PRIMARY, fontWeight: '600', fontSize: 14 },
+  mapHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  mapTitle: { fontSize: 16, fontWeight: '700', color: '#111827' },
+  mapFooter: { padding: 16, borderTopWidth: 1, borderTopColor: '#E5E7EB' },
+  confirmBtn: {
+    backgroundColor: '#1E3A8A', paddingVertical: 14, borderRadius: 14,
+    alignItems: 'center',
+  },
+  confirmBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   errorText: { fontSize: 12, color: Colors.RED_500, marginBottom: Spacing.SM, textAlign: 'right' },
   summaryCard: {
     backgroundColor: Colors.WHITE,
