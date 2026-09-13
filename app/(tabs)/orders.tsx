@@ -6,7 +6,6 @@ import { useRouter } from 'expo-router';
 import { Colors, Spacing, Radius } from '@/constants/colors';
 import { useOrdersStore, Order, OrderStatus } from '@/store/useOrdersStore';
 import { useCartStore } from '@/store/useCartStore';
-import { supabase } from '@/lib/supabase';
 
 const paymentLabels: Record<string, string> = {
   sedad: 'سداد',
@@ -31,7 +30,6 @@ function formatDate(iso: string): string {
 export default function OrdersScreen() {
   const router = useRouter();
   const orders = useOrdersStore((s) => s.orders);
-  const syncFromSupabase = useOrdersStore((s) => s.syncFromSupabase);
   const addItem = useCartStore((s) => s.addItem);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -48,7 +46,6 @@ export default function OrdersScreen() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await syncFromSupabase();
     setRefreshing(false);
   };
 
