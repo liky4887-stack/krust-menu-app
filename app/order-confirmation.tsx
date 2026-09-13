@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CheckCircle2, Store, Bike, Receipt, Home, ClipboardList } from 'lucide-react-native';
+import { CheckCircle2, Store, Bike, Receipt, Home, ClipboardList, MapPin } from 'lucide-react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors, Spacing, Radius } from '@/constants/colors';
 import { useOrdersStore } from '@/store/useOrdersStore';
@@ -96,6 +96,16 @@ export default function OrderConfirmationScreen() {
             <Text style={styles.estimatedText}>سيكون طلبك جاهزًا خلال 15-20 دقيقة</Text>
           </View>
         )}
+
+        {/* Track order button */}
+        <TouchableOpacity
+          style={styles.trackBtn}
+          onPress={() => router.push({ pathname: '/order-tracking', params: { orderId: params.orderId } })}
+          activeOpacity={0.85}
+        >
+          <MapPin size={18} color={Colors.WHITE} strokeWidth={2.5} />
+          <Text style={styles.trackBtnText}>تتبع الطلب</Text>
+        </TouchableOpacity>
 
         {/* Action buttons */}
         <View style={styles.actionsRow}>
@@ -217,4 +227,15 @@ const styles = StyleSheet.create({
   actionText: { fontSize: 14, fontWeight: '700', color: Colors.PRIMARY },
   actionBtnPrimary: { backgroundColor: Colors.PRIMARY, borderColor: Colors.PRIMARY },
   actionTextPrimary: { fontSize: 14, fontWeight: '700', color: Colors.WHITE },
+  trackBtn: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.PRIMARY_DARK,
+    borderRadius: Radius.PILL,
+    paddingVertical: Spacing.MD,
+    marginBottom: Spacing.MD,
+  },
+  trackBtnText: { color: Colors.WHITE, fontSize: 15, fontWeight: '700' },
 });
