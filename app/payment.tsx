@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ActivityIndicator, Image, Pressable } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, ShieldCheck } from 'lucide-react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors, Spacing, Radius } from '@/constants/colors';
 import { useCartStore } from '@/store/useCartStore';
 import { useOrdersStore, PaymentMethod, FulfillmentType } from '@/store/useOrdersStore';
+import PaymentSheet from '@/components/PaymentSheet';
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -20,14 +22,31 @@ export default function PaymentScreen() {
   const addOrder = useOrdersStore((s) => s.addOrder);
 
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
+  const [tempSelection, setTempSelection] = useState<PaymentMethod | null>(null);
+  const [sheetVisible, setSheetVisible] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const total = parseFloat(params.total || '0');
   const deliveryFee = params.fulfillment === 'delivery' ? 1.50 : 0;
 
+  const openPaymentSheet = () => {
+    setTempSelection(selectedMethod);
+    setSheetVisible(true);
+  };
+
+  const confirmPaymentMethod = () => {
+    if (!tempSelection) return;
+    setSelectedMethod(tempSelection);
+    setSheetVisible(false);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
   const handlePay = () => {
-    if (!selectedMethod) return;
+    if (!selectedMethod) {
+      openPaymentSheet();
+      return;
+    }
     setError(null);
 
     if (selectedMethod === 'cash') {
@@ -95,59 +114,32 @@ export default function PaymentScreen() {
           <Text style={styles.totalValue}>{total.toFixed(2)} د.ل</Text>
         </View>
 
-        {/* Payment methods */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>اختر طريقة الدفع</Text>
-
           <Pressable
-            onPress={() => setSelectedMethod('sedad')}
-            style={[
-              styles.payBtn,
-              selectedMethod === 'sedad' && styles.payBtnSelected,
-            ]}
+            onPress={openPaymentSheet}
+            style={[styles.methodSelector, selectedMethod && styles.methodSelectorSelected]}
             accessibilityRole="button"
-            accessibilityState={{ selected: selectedMethod === 'sedad' }}
-            accessibilityLabel="الدفع عبر سداد"
+            accessibilityLabel={selectedMethod ? 'تغيير طريقة الدفع' : 'اختر طريقة الدفع'}
           >
-            <Image
-              source={require('@/assets/images/payment/sedad.png')}
-              style={styles.payBtnImage}
-              resizeMode="contain"
-            />
-          </Pressable>
-
-          <Pressable
-            onPress={() => setSelectedMethod('edfaely')}
-            style={[
-              styles.payBtn,
-              selectedMethod === 'edfaely' && styles.payBtnSelected,
-            ]}
-            accessibilityRole="button"
-            accessibilityState={{ selected: selectedMethod === 'edfaely' }}
-            accessibilityLabel="الدفع عبر ادفعلي"
-          >
-            <Image
-              source={require('@/assets/images/payment/edfaely.png')}
-              style={styles.payBtnImage}
-              resizeMode="contain"
-            />
-          </Pressable>
-
-          <Pressable
-            onPress={() => setSelectedMethod('cash')}
-            style={[
-              styles.payBtn,
-              selectedMethod === 'cash' && styles.payBtnSelected,
-            ]}
-            accessibilityRole="button"
-            accessibilityState={{ selected: selectedMethod === 'cash' }}
-            accessibilityLabel="الدفع كاش"
-          >
-            <Image
-              source={require('@/assets/images/payment/cash.png')}
-              style={styles.payBtnImage}
-              resizeMode="contain"
-            />
+            {selectedMethod ? (
+              <>
+                <Text style={styles.changeMethodText}>تغيير</Text>
+                <Image
+                  source={selectedMethod === 'sedad'
+                    ? require('@/assets/images/payment/sedad.png')
+                    : selectedMethod === 'edfaely'
+                      ? require('@/assets/images/payment/edfaely.png')
+                      : require('@/assets/images/payment/cash.png')}
+                  style={styles.selectedMethodImage}
+                  resizeMode="contain"
+                />
+              </>
+            ) : (
+              <>
+                <ChevronLeft size={20} color="#111" strokeWidth={2} />
+                <Text style={styles.methodSelectorText}>اختر طريقة الدفع</Text>
+              </>
+            )}
           </Pressable>
 
           <View style={styles.securityNote}>
@@ -168,7 +160,7 @@ export default function PaymentScreen() {
         <TouchableOpacity
           style={[styles.footerPayBtn, !selectedMethod && styles.footerPayBtnDisabled, processing && styles.footerPayBtnProcessing]}
           onPress={handlePay}
-          disabled={!selectedMethod || processing}
+          disabled={processing}
           activeOpacity={0.85}
         >
           {processing ? (
@@ -186,6 +178,14 @@ export default function PaymentScreen() {
           )}
         </TouchableOpacity>
       </View>
+
+      <PaymentSheet
+        visible={sheetVisible}
+        selected={tempSelection}
+        onSelect={setTempSelection}
+        onClose={() => setSheetVisible(false)}
+        onConfirm={confirmPaymentMethod}
+      />
     </SafeAreaView>
   );
 }
@@ -216,10 +216,23 @@ const styles = StyleSheet.create({
   totalLabel: { fontSize: 14, color: '#D6E4F0', marginBottom: 6 },
   totalValue: { fontSize: 32, fontWeight: '800', color: Colors.WHITE },
   section: { paddingHorizontal: Spacing.LG, paddingTop: Spacing.LG },
-  sectionTitle: { fontSize: 17, fontWeight: '700', color: Colors.BLACK, marginBottom: Spacing.MD, textAlign: 'right' },
-  payBtn: { width: '100%', height: 72, marginBottom: 12, borderRadius: 36, overflow: 'hidden' },
-  payBtnImage: { width: '100%', height: '100%' },
-  payBtnSelected: { borderWidth: 2, borderColor: '#1E3A8A', elevation: 3 },
+  methodSelector: {
+    width: '100%',
+    height: 60,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F5F5F5',
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.MD,
+    overflow: 'hidden',
+  },
+  methodSelectorSelected: { backgroundColor: Colors.WHITE },
+  methodSelectorText: { color: '#111', fontSize: 16, fontWeight: '500' },
+  changeMethodText: { color: '#1E3A8A', fontSize: 13, fontWeight: '600' },
+  selectedMethodImage: { flex: 1, height: 58, marginLeft: Spacing.SM },
   securityNote: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
