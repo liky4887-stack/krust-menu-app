@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Dimensions, Pressable } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Dimensions, useWindowDimensions, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Heart, Star } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -12,10 +12,10 @@ import CategoryChip from '@/components/CategoryChip';
 import ProductCard from '@/components/ui/product-card';
 import FloatingCart from '@/components/FloatingCart';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const BANNER_WIDTH = SCREEN_WIDTH - Spacing.LG * 2;
-
 export default function HomeScreen() {
+  const { width: screenWidth } = useWindowDimensions();
+  const SLIDE_WIDTH = screenWidth - 32; // 16px horizontal padding each side
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [bannerIndex, setBannerIndex] = useState(0);
@@ -106,14 +106,17 @@ export default function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               pagingEnabled
+              snapToInterval={SLIDE_WIDTH + 12}
+              decelerationRate="fast"
               onScroll={(e) => {
-                const idx = Math.round(e.nativeEvent.contentOffset.x / BANNER_WIDTH);
+                const idx = Math.round(e.nativeEvent.contentOffset.x / SLIDE_WIDTH);
                 if (idx !== bannerIndex) setBannerIndex(idx);
               }}
               scrollEventThrottle={16}
+              contentContainerStyle={{ paddingHorizontal: 16 }}
             >
               {banners.map((banner, i) => (
-                <View key={i} style={[styles.bannerCard, { width: BANNER_WIDTH }]}>
+                <View key={i} style={[styles.bannerCard, { width: SLIDE_WIDTH }]}>
                   <View style={styles.bannerOverlay} />
                   <View style={styles.bannerContent}>
                     <Text style={styles.bannerText}>{banner.text}</Text>

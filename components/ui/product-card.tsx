@@ -114,21 +114,20 @@ export default function ProductCard({
             <Text style={styles.discountText}>-{discount}%</Text>
           </View>
         ) : null}
+        <Pressable
+          accessibilityLabel={wishlisted ? `إزالة ${title} من المفضلة` : `إضافة ${title} إلى المفضلة`}
+          accessibilityRole="button"
+          onPress={handleWishlist}
+          style={({ pressed }) => [styles.heartButton, pressed && styles.pressed]}
+        >
+          <Heart
+            size={16}
+            color={wishlisted ? Colors.RED_500 : Colors.DARK_GRAY}
+            fill={wishlisted ? Colors.RED_500 : 'transparent'}
+            strokeWidth={2}
+          />
+        </Pressable>
       </TouchableOpacity>
-      <Pressable
-        accessibilityLabel={wishlisted ? `إزالة ${title} من المفضلة` : `إضافة ${title} إلى المفضلة`}
-        accessibilityRole="button"
-        onPress={handleWishlist}
-        style={({ pressed }) => [styles.heartButton, pressed && styles.pressed]}
-      >
-        <Heart
-          size={16}
-          color={wishlisted ? Colors.RED_500 : Colors.DARK_GRAY}
-          fill={wishlisted ? Colors.RED_500 : 'transparent'}
-          strokeWidth={2}
-        />
-      </Pressable>
-
       <TouchableOpacity
         style={styles.content}
         activeOpacity={0.85}
@@ -241,14 +240,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     right: 10,
-    top: 48,
+    top: 10,
     width: 32,
     zIndex: 10,
     shadowColor: '#0A1B2A',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   pressed: {
     opacity: 0.65,

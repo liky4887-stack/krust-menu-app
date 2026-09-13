@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Minus, Plus, Trash2, MapPin, Tag, ChevronLeft } from 'lucide-react-native';
 import { Colors, Spacing, Radius } from '@/constants/colors';
@@ -18,10 +18,12 @@ export default function CartScreen() {
   const deliveryFee = items.length > 0 ? 1.50 : 0;
   const tax = subtotal * 0.08;
   const total = subtotal + deliveryFee + tax;
+  const insets = useSafeAreaInsets();
 
   const handleCheckout = () => {
     router.push('/checkout');
   };
+
 
   if (items.length === 0) {
     return (
@@ -57,7 +59,7 @@ export default function CartScreen() {
         <View style={styles.backBtn} />
       </View>
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 160 }}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 220 }}>
         {/* Delivery address */}
         <View style={styles.addressCard}>
           <View style={styles.addressIcon}>
@@ -155,7 +157,7 @@ export default function CartScreen() {
         </View>
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 16) + 100 }]}>
         <View style={styles.footerTotalRow}>
           <Text style={styles.footerTotalLabel}>الإجمالي</Text>
           <Text style={styles.footerTotalValue}>{total.toFixed(2)} د.ل</Text>
