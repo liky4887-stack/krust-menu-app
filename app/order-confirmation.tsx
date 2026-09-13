@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 16,
     elevation: 8,
+
   },
   title: { fontSize: 24, fontWeight: '800', color: Colors.EMERALD_600, textAlign: 'center', marginBottom: 4 },
   subtitle: { fontSize: 15, color: Colors.DARK_GRAY, textAlign: 'center', marginBottom: Spacing.XL },
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
     padding: Spacing.LG,
     alignItems: 'center',
     marginBottom: Spacing.LG,
+
   },
   orderNumberLabel: { fontSize: 13, color: Colors.DARK_GRAY, marginBottom: 4 },
   orderNumber: { fontSize: 20, fontWeight: '800', color: Colors.PRIMARY },
@@ -159,6 +161,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.BORDER,
     padding: Spacing.MD,
     marginBottom: Spacing.LG,
+
   },
   infoRow: { flexDirection: 'row-reverse', alignItems: 'center' },
   infoIcon: {
@@ -169,6 +172,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: Spacing.MD,
+
   },
   infoContent: { flex: 1 },
   infoLabel: { fontSize: 12, color: Colors.DARK_GRAY, marginBottom: 2 },
@@ -182,6 +186,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.BORDER,
     padding: Spacing.MD,
     marginBottom: Spacing.LG,
+
   },
   itemsTitle: { fontSize: 16, fontWeight: '700', color: Colors.BLACK, marginBottom: Spacing.MD, textAlign: 'right' },
   itemRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: Spacing.SM },
@@ -200,6 +205,7 @@ const styles = StyleSheet.create({
     padding: Spacing.MD,
     alignItems: 'center',
     marginBottom: Spacing.XL,
+
   },
   estimatedText: { fontSize: 14, fontWeight: '600', color: Colors.EMERALD_600, textAlign: 'center' },
   actionsRow: { flexDirection: 'row-reverse', gap: Spacing.MD },
@@ -214,8 +220,8 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.MD,
     borderWidth: 1.5,
     borderColor: Colors.PRIMARY,
+
   },
   actionText: { fontSize: 14, fontWeight: '700', color: Colors.PRIMARY },
   actionBtnPrimary: { backgroundColor: Colors.PRIMARY, borderColor: Colors.PRIMARY },
-  actionTextPrimary: { fontSize: 14, fontWeight: '700', color: Colors.WHITE },trackBtnText: { color: Colors.WHITE, fontSize: 15, fontWeight: '700' },
 });

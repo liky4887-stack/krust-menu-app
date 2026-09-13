@@ -33,16 +33,6 @@ export default function OrdersScreen() {
   const addItem = useCartStore((s) => s.addItem);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    syncFromSupabase();
-    const channel = supabase
-      .channel('orders-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-        syncFromSupabase();
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, []);
 
   const handleRefresh = async () => {
     setRefreshing(true);
