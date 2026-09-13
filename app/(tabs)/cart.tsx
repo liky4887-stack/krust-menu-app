@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.BORDER,
   },
   backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  topBarTitle: { fontSize: 18, fontWeight: '700', color: Colors.BLACK },
+  topBarTitle: { flex: 1, fontSize: 18, fontWeight: '700', color: Colors.BLACK, textAlign: 'right' },
   container: { flex: 1 },
   addressCard: {
     flexDirection: 'row-reverse',

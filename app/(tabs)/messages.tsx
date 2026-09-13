@@ -281,11 +281,15 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '800',
     color: Colors.PRIMARY,
+    textAlign: 'right',
+    alignSelf: 'stretch',
   },
   headerSubtitle: {
     fontSize: 14,
     color: Colors.DARK_GRAY,
     marginTop: 2,
+    textAlign: 'right',
+    alignSelf: 'stretch',
   },
   container: {
     flex: 1,
