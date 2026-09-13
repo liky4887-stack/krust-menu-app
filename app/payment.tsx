@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ActivityIndicator, Image, Pressable } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, ShieldCheck } from 'lucide-react-native';
+import { ChevronLeft, ShieldCheck, Check, Landmark, Wallet, Banknote } from 'lucide-react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors, Spacing, Radius } from '@/constants/colors';
 import { useCartStore } from '@/store/useCartStore';
@@ -78,6 +78,43 @@ export default function PaymentScreen() {
     }
   };
 
+  const renderPayButton = (
+    method: PaymentMethod,
+    label: string,
+    subtitle: string,
+    icon: typeof Landmark,
+    baseColor: string,
+    selectedStyle: any,
+  ) => {
+    const isSelected = selectedMethod === method;
+    const Icon = icon;
+    return (
+      <Pressable
+        onPress={() => setSelectedMethod(method)}
+        style={[
+          styles.payBtn,
+          { backgroundColor: baseColor },
+          isSelected && selectedStyle,
+          !isSelected && { opacity: 0.85 },
+        ]}
+        accessibilityRole="button"
+        accessibilityState={{ selected: isSelected }}
+        accessibilityLabel={`الدفع عبر ${label}`}
+      >
+        <View style={[styles.payBtnIcon, { backgroundColor: 'rgba(255,255,255,0.25)' }]}>
+          <Icon size={28} color="#FFFFFF" strokeWidth={2} />
+        </View>
+        <View style={styles.payBtnInfo}>
+          <Text style={styles.payBtnLabel}>{label}</Text>
+          <Text style={styles.payBtnSubtitle}>{subtitle}</Text>
+        </View>
+        <View style={[styles.payBtnRadio, isSelected && styles.payBtnRadioActive]}>
+          {isSelected && <Check size={14} color="#FFFFFF" strokeWidth={3} />}
+        </View>
+      </Pressable>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.topBar}>
@@ -99,47 +136,9 @@ export default function PaymentScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>اختر طريقة الدفع</Text>
 
-          <Pressable
-            onPress={() => setSelectedMethod('sedad')}
-            style={[styles.payBtn, selectedMethod === 'sedad' && styles.payBtnSelectedSedad]}
-            accessibilityRole="button"
-            accessibilityState={{ selected: selectedMethod === 'sedad' }}
-            accessibilityLabel="الدفع عبر سداد"
-          >
-            <Image
-              source={require('@/assets/images/payment/sedad.png')}
-              style={[styles.payBtnImage, selectedMethod !== 'sedad' && { opacity: 0.85 }]}
-              resizeMode="contain"
-            />
-          </Pressable>
-
-          <Pressable
-            onPress={() => setSelectedMethod('edfaely')}
-            style={[styles.payBtn, selectedMethod === 'edfaely' && styles.payBtnSelectedEdfaely]}
-            accessibilityRole="button"
-            accessibilityState={{ selected: selectedMethod === 'edfaely' }}
-            accessibilityLabel="الدفع عبر ادفعلي"
-          >
-            <Image
-              source={require('@/assets/images/payment/edfaely.png')}
-              style={[styles.payBtnImage, selectedMethod !== 'edfaely' && { opacity: 0.85 }]}
-              resizeMode="contain"
-            />
-          </Pressable>
-
-          <Pressable
-            onPress={() => setSelectedMethod('cash')}
-            style={[styles.payBtn, selectedMethod === 'cash' && styles.payBtnSelectedCash]}
-            accessibilityRole="button"
-            accessibilityState={{ selected: selectedMethod === 'cash' }}
-            accessibilityLabel="الدفع كاش"
-          >
-            <Image
-              source={require('@/assets/images/payment/cash.png')}
-              style={[styles.payBtnImage, selectedMethod !== 'cash' && { opacity: 0.85 }]}
-              resizeMode="contain"
-            />
-          </Pressable>
+          {renderPayButton('sedad', 'سداد', 'تحويل فوري ومأمون', Landmark, '#FF8A00', styles.payBtnSelectedSedad)}
+          {renderPayButton('edfaely', 'ادفعلي', 'محفظة إلكترونية سريعة', Wallet, '#FF8A00', styles.payBtnSelectedEdfaely)}
+          {renderPayButton('cash', 'الدفع كاش', 'ادفع نقدًا عند استلام طلبك', Banknote, '#1E3A8A', styles.payBtnSelectedCash)}
 
           <View style={styles.securityNote}>
             <ShieldCheck size={16} color={Colors.DARK_GRAY} strokeWidth={2} />
@@ -208,11 +207,40 @@ const styles = StyleSheet.create({
   totalValue: { fontSize: 32, fontWeight: '800', color: Colors.WHITE },
   section: { paddingHorizontal: Spacing.LG, paddingTop: Spacing.LG },
   sectionTitle: { fontSize: 17, fontWeight: '700', color: Colors.BLACK, marginBottom: Spacing.MD, textAlign: 'right' },
-  payBtn: { width: '100%', height: 72, marginBottom: 12, borderRadius: 36, overflow: 'hidden' },
-  payBtnImage: { width: '100%', height: '100%' },
-  payBtnSelectedSedad: { borderWidth: 2, borderColor: '#FF8A00', elevation: 3 },
-  payBtnSelectedEdfaely: { borderWidth: 2, borderColor: '#FF8A00', elevation: 3 },
-  payBtnSelectedCash: { borderWidth: 2, borderColor: '#1E3A8A', elevation: 3 },
+  payBtn: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    width: '100%',
+    height: 72,
+    marginBottom: 12,
+    borderRadius: 36,
+    overflow: 'hidden',
+    paddingHorizontal: Spacing.MD,
+  },
+  payBtnIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: Spacing.SM,
+  },
+  payBtnInfo: { flex: 1 },
+  payBtnLabel: { fontSize: 18, fontWeight: '800', color: '#FFFFFF', textAlign: 'right', marginBottom: 2 },
+  payBtnSubtitle: { fontSize: 12, color: 'rgba(255,255,255,0.8)', textAlign: 'right' },
+  payBtnRadio: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  payBtnRadioActive: { backgroundColor: 'rgba(255,255,255,0.3)', borderColor: '#FFFFFF' },
+  payBtnSelectedSedad: { backgroundColor: '#FF8A00', borderWidth: 2, borderColor: '#FF8A00', elevation: 3 },
+  payBtnSelectedEdfaely: { backgroundColor: '#FF8A00', borderWidth: 2, borderColor: '#FF8A00', elevation: 3 },
+  payBtnSelectedCash: { backgroundColor: '#1E3A8A', borderWidth: 2, borderColor: '#1E3A8A', elevation: 3 },
   securityNote: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
