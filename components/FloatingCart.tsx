@@ -67,7 +67,7 @@ export default function FloatingCart() {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 80,
+    bottom: 90,
     left: Spacing.LG,
     right: Spacing.LG,
     zIndex: 50,

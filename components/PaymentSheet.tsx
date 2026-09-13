@@ -1,23 +1,30 @@
-import { useState } from 'react';
-import { Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { X } from 'lucide-react-native';
+import {
+  Modal,
+  View,
+  Text,
+  Image,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
+import Animated, { SlideInDown } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 
-export type PaymentMethodKey = 'sedad' | 'edfaely' | 'cash';
+export type PaymentKey = 'sedad' | 'edfaely' | 'cash';
 
 interface PaymentSheetProps {
   visible: boolean;
-  selected: PaymentMethodKey | null;
-  onSelect: (method: PaymentMethodKey) => void;
+  selected: PaymentKey | null;
+  onSelect: (m: PaymentKey) => void;
   onClose: () => void;
   onConfirm: () => void;
 }
 
-const paymentMethods: { key: PaymentMethodKey; label: string; image: number }[] = [
-  { key: 'sedad', label: 'الدفع عبر سداد', image: require('@/assets/images/payment/sedad.png') },
-  { key: 'edfaely', label: 'الدفع عبر ادفعي', image: require('@/assets/images/payment/edfaely.png') },
-  { key: 'cash', label: 'الدفع كاش', image: require('@/assets/images/payment/cash.png') },
+const METHODS: { key: PaymentKey; image: any }[] = [
+  { key: 'sedad',   image: require('@/assets/images/payment/sedad.png') },
+  { key: 'edfaely', image: require('@/assets/images/payment/edfaely.png') },
+  { key: 'cash',    image: require('@/assets/images/payment/cash.png') },
 ];
 
 export default function PaymentSheet({
@@ -27,56 +34,62 @@ export default function PaymentSheet({
   onClose,
   onConfirm,
 }: PaymentSheetProps) {
-  const [isClosing, setIsClosing] = useState(false);
-
-  const handleClose = () => {
-    setIsClosing(true);
-    onClose();
-  };
-
-  const handleSelect = (method: PaymentMethodKey) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onSelect(method);
-  };
+  const { width: screenWidth } = useWindowDimensions();
+  // Cap so pill height stays reasonable: width = 2.14 × height
+  // At 340px wide → 159px tall. At 400px → 187px tall.
+  const pillWidth = Math.min(screenWidth - 60, 360);
 
   return (
-    <Modal
-      visible={visible && !isClosing}
-      transparent
-      animationType="slide"
-      onRequestClose={handleClose}
-      onShow={() => setIsClosing(false)}
-    >
-      <Pressable style={styles.backdrop} onPress={handleClose}>
-        <Animated.View entering={FadeInDown.duration(260)} style={styles.sheet}>
-          <Pressable onPress={(event) => event.stopPropagation()}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable style={styles.backdrop} onPress={onClose}>
+        <Animated.View
+          entering={SlideInDown.springify().damping(20).stiffness(200)}
+          style={styles.sheet}
+        >
+          <Pressable onPress={() => {}} style={styles.sheetInner}>
             <View style={styles.handle} />
-            <TouchableOpacity onPress={handleClose} style={styles.closeBtn} accessibilityRole="button" accessibilityLabel="إغلاق">
-              <X size={24} color="#111" strokeWidth={2.2} />
-            </TouchableOpacity>
-            <Text style={styles.title}>اختر طريقة الدفع</Text>
-
-            {paymentMethods.map((method) => (
-              <Pressable
-                key={method.key}
-                onPress={() => handleSelect(method.key)}
-                style={[styles.pillRow, selected === method.key && styles.pillSelected]}
-                accessibilityRole="button"
-                accessibilityState={{ selected: selected === method.key }}
-                accessibilityLabel={method.label}
-              >
-                <Image source={method.image} style={styles.pillImage} resizeMode="contain" />
+            <View style={styles.headerRow}>
+              <Pressable onPress={onClose} hitSlop={12} style={styles.closeBtn}>
+                <Ionicons name="close" size={24} color="#111" />
               </Pressable>
-            ))}
+              <Text style={styles.title}>اختر طريقة الدفع</Text>
+            </View>
 
-            <TouchableOpacity
-              onPress={onConfirm}
-              disabled={!selected}
+            {METHODS.map((m) => {
+              const isSel = selected === m.key;
+              return (
+                <Pressable
+                  key={m.key}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    onSelect(m.key);
+                  }}
+                  style={({ pressed }) => [
+                    styles.pillRow,
+                    { width: pillWidth },
+                    pressed && { transform: [{ scale: 0.97 }] },
+                  ]}
+                >
+                  <Image
+                    source={m.image}
+                    style={styles.pillImage}
+                    resizeMode="stretch"
+                  />
+                  {isSel && <View style={styles.selectedRing} />}
+                </Pressable>
+              );
+            })}
+
+            <Pressable
               style={[styles.confirmBtn, !selected && styles.confirmBtnDisabled]}
-              activeOpacity={0.85}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                onConfirm();
+              }}
+              disabled={!selected}
             >
               <Text style={styles.confirmText}>اختر</Text>
-            </TouchableOpacity>
+            </Pressable>
           </Pressable>
         </Animated.View>
       </Pressable>
@@ -85,61 +98,49 @@ export default function PaymentSheet({
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' },
   sheet: {
+    width: '100%',
     backgroundColor: '#fff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingTop: 12,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingTop: 10,
     paddingBottom: 32,
   },
+  sheetInner: { width: '100%' },
   handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#E0E0E0',
+    width: 44, height: 5, borderRadius: 3,
+    backgroundColor: '#D9D9D9',
+    alignSelf: 'center', marginBottom: 16,
+  },
+  headerRow: {
+    flexDirection: 'row', alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20, marginBottom: 20,
+  },
+  closeBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 18, fontWeight: '700', color: '#111', textAlign: 'right' },
+  pillRow: {
     alignSelf: 'center',
-    marginBottom: 8,
-  },
-  closeBtn: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    zIndex: 10,
-    width: 32,
-    height: 32,
-    alignItems: 'center',
+    aspectRatio: 2.14,
+    marginBottom: 14,
     justifyContent: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111',
-    textAlign: 'right',
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
-  pillRow: { width: '100%', paddingHorizontal: 20, marginBottom: 12 },
-  pillImage: { width: '100%', height: 90 },
-  pillSelected: {
-    borderWidth: 2,
-    borderColor: '#1E3A8A',
     borderRadius: 999,
-    shadowColor: '#1E3A8A',
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
+    overflow: 'hidden',
+  },
+  pillImage: { width: '100%', height: '100%' },
+  selectedRing: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 999,
+    borderWidth: 3,
+    borderColor: '#1E3A8A',
+    opacity: 0.9,
   },
   confirmBtn: {
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: '#0F4C3A',
-    marginHorizontal: 20,
-    marginTop: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: 56, borderRadius: 16, backgroundColor: '#0F4C3A',
+    marginHorizontal: 20, marginTop: 20,
+    alignItems: 'center', justifyContent: 'center',
   },
-  confirmBtnDisabled: { opacity: 0.5 },
+  confirmBtnDisabled: { backgroundColor: '#B8C7C1' },
   confirmText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });

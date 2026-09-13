@@ -71,7 +71,11 @@ export default function CartScreen() {
               {profile?.address ?? 'لم يتم تحديد العنوان بعد'}
             </Text>
           </View>
-          <TouchableOpacity style={styles.addressEdit}>
+          <TouchableOpacity
+            style={styles.addressEdit}
+            onPress={handleCheckout}
+            activeOpacity={0.7}
+          >
             <Text style={styles.addressEditText}>تعديل</Text>
           </TouchableOpacity>
         </View>

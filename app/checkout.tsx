@@ -92,11 +92,24 @@ export default function CheckoutScreen() {
           longitude: pos.coords.longitude,
         });
         if (results.length > 0) {
-          const r = results[0];
-          const city = r.city || r.subregion || r.region || 'بنغازي';
-          const street = r.street || r.name || '';
-          const district = r.district || '';
-          formatted = [city, district, street].filter(Boolean).join('، ');
+          const r: any = results[0];
+          if (r.formattedAddress && r.formattedAddress.length > 0) {
+            formatted = r.formattedAddress;
+          } else {
+            const parts: string[] = [];
+            if (r.name && r.name !== r.street) parts.push(r.name);
+            if (r.street) parts.push(r.street);
+            if (r.streetNumber) parts.push(r.streetNumber);
+            if (r.district) parts.push(r.district);
+            if (r.subregion && r.subregion !== r.city) parts.push(r.subregion);
+            if (r.city) parts.push(r.city);
+            if (r.region && r.region !== r.city) parts.push(r.region);
+            if (parts.length === 0) {
+              parts.push('بنغازي');
+              parts.push(pos.coords.latitude.toFixed(6) + '، ' + pos.coords.longitude.toFixed(6));
+            }
+            formatted = parts.join('، ');
+          }
         }
       } catch (geoErr) {
         formatted = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
@@ -117,11 +130,23 @@ export default function CheckoutScreen() {
       longitude: region.longitude,
     });
     if (results.length > 0) {
-      const r = results[0];
-      const city = r.city || r.subregion || r.region || 'بنغازي';
-      const street = r.street || r.name || '';
-      const district = r.district || '';
-      setAddress([city, district, street].filter(Boolean).join('، '));
+      const r: any = results[0];
+      if (r.formattedAddress && r.formattedAddress.length > 0) {
+        setAddress(r.formattedAddress);
+      } else {
+        const parts: string[] = [];
+        if (r.name && r.name !== r.street) parts.push(r.name);
+        if (r.street) parts.push(r.street);
+        if (r.streetNumber) parts.push(r.streetNumber);
+        if (r.district) parts.push(r.district);
+        if (r.subregion && r.subregion !== r.city) parts.push(r.subregion);
+        if (r.city) parts.push(r.city);
+        if (parts.length === 0) {
+          parts.push('بنغازي');
+          parts.push(region.latitude.toFixed(6) + '، ' + region.longitude.toFixed(6));
+        }
+        setAddress(parts.join('، '));
+      }
     }
   }
 
@@ -282,10 +307,10 @@ export default function CheckoutScreen() {
                 </View>
                 <TouchableOpacity
                   style={styles.pickOnMapBtn}
-                  onPress={() => setMapVisible(true)}
+                  onPress={useCurrentLocation}
                 >
                   <Ionicons name="map-outline" size={18} color={Colors.PRIMARY} />
-                  <Text style={styles.pickOnMapText}>اختر موقعك من الخريطة</Text>
+                  <Text style={styles.pickOnMapText}>تحديد موقعي تلقائياً</Text>
                 </TouchableOpacity>
                 {submitted && errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
               </>
