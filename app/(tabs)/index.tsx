@@ -106,7 +106,7 @@ export default function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               pagingEnabled={false}
-              snapToInterval={SLIDE_WIDTH}
+              snapToInterval={SLIDE_WIDTH + 16}
               snapToAlignment="start"
               decelerationRate="fast"
               onScroll={(e) => {
@@ -118,7 +118,7 @@ export default function HomeScreen() {
               style={{ marginHorizontal: 0 }}
             >
               {banners.map((banner, i) => (
-                <View key={i} style={[styles.bannerCard, { width: SLIDE_WIDTH }]}>
+                <View key={i} style={[styles.bannerCard, { width: SLIDE_WIDTH, marginRight: 16 }]>
                   <View style={styles.bannerOverlay} />
                   <View style={styles.bannerContent}>
                     <Text style={styles.bannerText}>{banner.text}</Text>
