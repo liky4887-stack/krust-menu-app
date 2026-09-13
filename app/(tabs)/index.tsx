@@ -13,8 +13,7 @@ import ProductCard from '@/components/ui/product-card';
 import FloatingCart from '@/components/FloatingCart';
 
 export default function HomeScreen() {
-  const { width: screenWidth } = useWindowDimensions();
-  const SLIDE_WIDTH = screenWidth - 32; // 16px horizontal padding each side
+  const [carouselWidth, setCarouselWidth] = useState(0);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -106,11 +105,12 @@ export default function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               pagingEnabled={false}
-              snapToInterval={SLIDE_WIDTH + 16}
+              onLayout={(e) => setCarouselWidth(e.nativeEvent.layout.width)}
+              snapToInterval={carouselWidth > 0 ? carouselWidth - 16 : undefined}
               snapToAlignment="start"
               decelerationRate="fast"
               onScroll={(e) => {
-                const idx = Math.round(e.nativeEvent.contentOffset.x / SLIDE_WIDTH);
+                const idx = Math.round(e.nativeEvent.contentOffset.x / (carouselWidth > 0 ? carouselWidth - 16 : 1));
                 if (idx !== bannerIndex) setBannerIndex(idx);
               }}
               scrollEventThrottle={16}
@@ -118,7 +118,7 @@ export default function HomeScreen() {
               style={{ marginHorizontal: 0 }}
             >
               {banners.map((banner, i) => (
-                <View key={i} style={[styles.bannerCard, { width: SLIDE_WIDTH, marginRight: 16 }]>
+                <View key={i} style={[styles.bannerCard, { width: carouselWidth > 0 ? carouselWidth - 32 : 0, marginRight: 16 }]}>
                   <View style={styles.bannerOverlay} />
                   <View style={styles.bannerContent}>
                     <Text style={styles.bannerText}>{banner.text}</Text>
